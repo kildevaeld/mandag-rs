@@ -1,0 +1,23 @@
+[package]
+edition = "2021"
+name = "mandag"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dale = {git = "https://github.com/kildevaeld/dale-rs", features = ["alloc"]}
+dale-extensions = {git = "https://github.com/kildevaeld/dale-rs", features = ["http"]}
+dale-http = {git = "https://github.com/kildevaeld/dale-rs", features = ["router"]}
+router = {git = "https://github.com/kildevaeld/router-rs", features = []}
+
+mandag-core = {path = "../mandag-core"}
+mandag-macros = {path = "../mandag-macros"}
+mandag-serve = {path = "../mandag-serve"}
+
+pin-project-lite = "0.2"
+
+parking_lot = "0.12"
+
+[dev-dependencies]
+tokio = {version = "1", features = ["rt", "macros"]}

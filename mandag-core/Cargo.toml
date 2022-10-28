@@ -1,0 +1,18 @@
+[package]
+edition = "2021"
+name = "mandag-core"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1"
+dale = {git = "https://github.com/kildevaeld/dale-rs"}
+dale-http = {git = "https://github.com/kildevaeld/dale-rs", features = ["hyper"]}
+hyper = {version = "0.14"}
+pin-project-lite = "0.2"
+thiserror = "1"
+
+[dev-dependencies]
+mandag-serve = {path = "../mandag-serve"}
+tokio = {version = "1", features = ["rt", "macros"]}

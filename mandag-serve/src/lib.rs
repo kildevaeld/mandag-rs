@@ -9,7 +9,7 @@ use std::{
 };
 
 use dale::{IntoOutcome, Service};
-use dale_http::{error::Error, hyper::MakeTaskHyperService, Reply};
+use dale_http::{hyper::MakeTaskHyperService, Reply};
 use hyper::{
     server::{conn::AddrIncoming, Builder},
     Server,

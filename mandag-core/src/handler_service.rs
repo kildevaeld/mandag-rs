@@ -42,7 +42,7 @@ where
 
             let data = match data_reg {
                 Ok(ret) => ret,
-                Err(err) => panic!(),
+                Err(_err) => panic!("call failed"),
             };
 
             let ret = match handler.handle(input, data).await {

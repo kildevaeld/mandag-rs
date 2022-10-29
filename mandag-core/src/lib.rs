@@ -8,11 +8,3 @@ mod types;
 pub use self::{error::*, from_body::FromBody, from_request::FromRequest, handler::*, types::*};
 
 pub use async_trait::async_trait;
-
-struct Route {
-    method: dale_http::Method,
-}
-
-const ROUTE: Route = Route {
-    method: dale_http::Method::GET,
-};

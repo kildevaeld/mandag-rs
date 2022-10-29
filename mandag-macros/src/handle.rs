@@ -93,7 +93,7 @@ pub fn create_handler(input: &ItemFn, data: &Option<String>) -> TokenStream {
 }
 
 pub fn create(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let crate_name = crate_ident_name("mandag");
+    let _crate_name = crate_ident_name("mandag");
 
     let attr_args = parse_macro_input!(attr as AttributeArgs);
 
@@ -111,7 +111,7 @@ pub fn create(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 fn parse_data_type<'a>(
     item: &'a ItemFn,
-    crate_name: &syn::Ident,
+    _crate_name: &syn::Ident,
     data: Option<&str>,
 ) -> impl ToTokens + 'a {
     match data {

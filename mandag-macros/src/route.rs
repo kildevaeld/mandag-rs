@@ -11,7 +11,7 @@ pub enum Method {
     Put,
     Patch,
     Delete,
-    Options,
+    // Options,
     Head,
 }
 
@@ -23,7 +23,7 @@ impl Method {
             Method::Put => quote!(#crate_name::http::Method::PUT),
             Method::Patch => quote!(#crate_name::http::Method::PATCH),
             Method::Delete => quote!(#crate_name::http::Method::DELETE),
-            Method::Options => quote!(#crate_name::http::Method::OPTIONS),
+            // Method::Options => quote!(#crate_name::http::Method::OPTIONS),
             Method::Head => quote!(#crate_name::http::Method::HEAD),
         }
     }

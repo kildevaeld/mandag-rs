@@ -3,7 +3,7 @@ use proc_macro2::{Ident, Span};
 use proc_macro_crate::{crate_name, FoundCrate};
 use quote::quote;
 use router::{AsSegments, Segment};
-use syn::{FnArg, ItemFn, Pat, PatType, Type};
+use syn::{FnArg, ItemFn, Pat, PatType};
 
 pub fn crate_ident_name(name: &str) -> syn::Ident {
     let found_crate = crate_name(name).expect(&format!("{} is present in `Cargo.toml`", name));
@@ -35,47 +35,47 @@ pub fn get_name(pat: &syn::Pat) -> String {
     }
 }
 
-pub fn parse_fn_inputs<'a>(
-    item: &'a ItemFn,
-    data: Option<&'a str>,
-) -> impl Iterator<Item = impl ToTokens + 'a> + 'a {
-    item.sig
-        .inputs
-        .iter()
-        .filter_map(|item| match item {
-            FnArg::Receiver(_) => None,
-            FnArg::Typed(item) => Some(item),
-        })
-        .filter_map(move |item| {
-            //
-            match &data {
-                Some(data) => {
-                    if data != &get_name(&item.pat) {
-                        Some(item)
-                    } else {
-                        None
-                    }
-                }
-                None => Some(item),
-            }
-        })
-        .map(|item| {
-            let ty = &item.ty;
-            let ret = match &**ty {
-                Type::Reference(refe) => {
-                    let ty = &refe.elem;
-                    quote! {
-                        &'r #ty
-                    }
-                }
-                _ => quote!(
-                    #ty
-                ),
-            };
+// pub fn parse_fn_inputs<'a>(
+//     item: &'a ItemFn,
+//     data: Option<&'a str>,
+// ) -> impl Iterator<Item = impl ToTokens + 'a> + 'a {
+//     item.sig
+//         .inputs
+//         .iter()
+//         .filter_map(|item| match item {
+//             FnArg::Receiver(_) => None,
+//             FnArg::Typed(item) => Some(item),
+//         })
+//         .filter_map(move |item| {
+//             //
+//             match &data {
+//                 Some(data) => {
+//                     if data != &get_name(&item.pat) {
+//                         Some(item)
+//                     } else {
+//                         None
+//                     }
+//                 }
+//                 None => Some(item),
+//             }
+//         })
+//         .map(|item| {
+//             let ty = &item.ty;
+//             let ret = match &**ty {
+//                 Type::Reference(refe) => {
+//                     let ty = &refe.elem;
+//                     quote! {
+//                         &'r #ty
+//                     }
+//                 }
+//                 _ => quote!(
+//                     #ty
+//                 ),
+//             };
 
-            ret
-        })
-}
+//             ret
+//         })
+// }
 
 pub fn parse_route<'a, S: AsSegments<'a>>(
     crate_name: &'a Ident,

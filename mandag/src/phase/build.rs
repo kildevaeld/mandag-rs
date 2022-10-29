@@ -9,7 +9,6 @@ use crate::{
 use dale::ServiceExt;
 use dale_extensions::StateMiddleware;
 use dale_http::error::Error;
-use parking_lot::Mutex;
 
 #[derive(Default)]
 pub struct ModuleBuildContext {

@@ -1,7 +1,5 @@
-use std::sync::Arc;
-
 use http::Extensions;
-use parking_lot::{Mutex, RwLock};
+use parking_lot::RwLock;
 
 #[derive(Debug)]
 pub struct Store {

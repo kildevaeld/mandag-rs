@@ -1,9 +1,5 @@
-use std::sync::Arc;
-
-use http::Extensions;
-use parking_lot::RwLock;
-
 use crate::store::Store;
+use std::sync::Arc;
 
 #[derive(Debug)]
 struct AppInner {

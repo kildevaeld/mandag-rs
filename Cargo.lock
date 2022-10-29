@@ -272,6 +272,7 @@ dependencies = [
  "dale",
  "dale-extensions",
  "dale-http",
+ "http",
  "mandag-core",
  "mandag-macros",
  "mandag-serve",

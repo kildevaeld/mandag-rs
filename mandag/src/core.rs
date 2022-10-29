@@ -1,6 +1,7 @@
 use crate::{
     app::App,
-    phase::{Build, Init, ModuleBuildContext, Phase, Start},
+    extension::Extension,
+    phase::{Build, ExtensionContext, Init, ModuleBuildContext, Phase, Start},
     router::{into_routes_box, IntoRoutes, RouterService},
     Module,
 };
@@ -20,20 +21,27 @@ impl Default for Core<Init> {
 }
 
 impl Core<Init> {
-    pub async fn build(self) -> Core<Build> {
-        Core {
-            phase: Build {
-                routes: Vec::default(),
-                modules: Vec::default(),
-            },
-        }
+    pub async fn build(self) -> Result<Core<Build>, Error> {
+        let phase = self.phase.build().await?;
+
+        let core = Core { phase };
+
+        Ok(core)
+    }
+
+    pub fn attach<E>(mut self, extension: E) -> Self
+    where
+        E: Extension<ExtensionContext> + 'static,
+    {
+        self.phase.extensions.push(Box::new(extension));
+        self
     }
 }
 
 impl Core<Build> {
     pub fn route<R>(mut self, route: R) -> Self
     where
-        R: IntoRoutes + Send + 'static,
+        R: IntoRoutes + Sync + Send + 'static,
         R::Error: std::error::Error + Send + Sync,
     {
         self.phase.routes.push(into_routes_box(route));

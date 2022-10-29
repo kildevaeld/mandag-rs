@@ -1,7 +1,8 @@
 use std::convert::Infallible;
 
 use mandag::{
-    async_trait, http::Request, prelude::*, router::Router, Core, Module, ModuleBuildCtx, Route,
+    async_trait, http::Request, prelude::*, router::Router, Core, Error, Extension, ExtensionCtx,
+    Module, ModuleBuildCtx, Route,
 };
 use mandag_core::Body;
 
@@ -24,11 +25,22 @@ fn test() {
     "Mif"
 }
 
+struct TestExt;
+
+#[async_trait]
+impl<C: ExtensionCtx> Extension<C> for TestExt {
+    async fn init(&self, ctx: &mut C) -> Result<(), Error> {
+        println!("init extension");
+        Ok(())
+    }
+}
+
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     Core::default()
+        .attach(TestExt)
         .build()
-        .await
+        .await?
         .route(Route::get(
             "/",
             |_req: Request| async move { "Hello, World!" },

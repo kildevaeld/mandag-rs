@@ -3,6 +3,7 @@ use crate::{
     app::App,
     module::{Module, ModuleBuildCtx},
     router::{into_routes_box, IntoRoutesBox, Router},
+    store::Store,
     types::IntoService,
 };
 use dale::ServiceExt;
@@ -12,27 +13,29 @@ use parking_lot::Mutex;
 
 #[derive(Default)]
 pub struct ModuleBuildContext {
-    pub routes: Mutex<Vec<Box<dyn IntoRoutesBox>>>,
+    pub routes: Vec<Box<dyn IntoRoutesBox>>,
 }
 
 impl ModuleBuildCtx for ModuleBuildContext {
     fn route<R>(&mut self, route: R) -> &mut Self
     where
-        R: crate::router::IntoRoutes + Send + 'static,
+        R: crate::router::IntoRoutes + Sync + Send + 'static,
         R::Error: std::error::Error + Send + Sync,
     {
-        self.routes.lock().push(into_routes_box(route));
+        self.routes.push(into_routes_box(route));
         self
     }
 }
 
 pub struct Build {
+    pub store: Store,
     pub routes: Vec<Box<dyn IntoRoutesBox>>,
     pub modules: Vec<Box<dyn Module<ModuleBuildContext>>>,
 }
 
 impl Build {
     pub async fn build(self) -> Result<Start, Error> {
+        let store = self.store;
         let mut router = Router::default();
         for route in self.routes {
             let routes = route.into_routes()?;
@@ -42,16 +45,14 @@ impl Build {
         }
 
         let mut ctx = ModuleBuildContext {
-            routes: Mutex::new(Vec::default()),
+            routes: Vec::default(),
         };
 
         for module in self.modules {
             module.build(&mut ctx).await;
         }
 
-        let mut lock = ctx.routes.lock();
-
-        let routes = std::mem::replace(&mut *lock, Vec::default());
+        let routes = ctx.routes;
 
         for route in routes {
             let routes = route.into_routes()?;
@@ -60,7 +61,9 @@ impl Build {
             }
         }
 
-        let service = router.into_service().wrap(StateMiddleware::new(App {}));
+        let service = router
+            .into_service()
+            .wrap(StateMiddleware::new(App::new(store)));
 
         Ok(Start { service })
     }

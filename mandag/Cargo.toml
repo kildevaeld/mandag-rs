@@ -11,6 +11,7 @@ dale-extensions = {git = "https://github.com/kildevaeld/dale-rs", features = ["h
 dale-http = {git = "https://github.com/kildevaeld/dale-rs", features = ["router"]}
 router = {git = "https://github.com/kildevaeld/router-rs", features = []}
 
+http = "0.2"
 mandag-core = {path = "../mandag-core"}
 mandag-macros = {path = "../mandag-macros"}
 mandag-serve = {path = "../mandag-serve"}

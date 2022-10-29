@@ -2,8 +2,11 @@ mod app;
 mod core;
 mod core_service;
 mod phase;
+mod store;
 mod types;
 
+// Maybe move to core?
+mod extension;
 mod module;
 
 mod request_ext;
@@ -14,7 +17,7 @@ pub use mandag_core::{async_trait, Handler, Reply};
 
 pub mod router;
 
-pub use self::{core::Core, module::*, router::Route};
+pub use self::{core::Core, extension::*, module::*, router::Route};
 
 pub use dale_http::error::Error;
 

@@ -29,7 +29,7 @@ struct TestExt;
 
 #[async_trait]
 impl<C: ExtensionCtx> Extension<C> for TestExt {
-    async fn init(&self, ctx: &mut C) -> Result<(), Error> {
+    async fn init(&self, _ctx: &mut C) -> Result<(), Error> {
         println!("init extension");
         Ok(())
     }

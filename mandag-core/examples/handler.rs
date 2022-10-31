@@ -1,6 +1,3 @@
-use std::convert::Infallible;
-
-use dale::Outcome;
 use dale_http::error::Error;
 use mandag_core::{async_trait, Handler, HandlerExt};
 use mandag_serve::ServiceServeExt;

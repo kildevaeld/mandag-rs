@@ -16,14 +16,6 @@ pub trait IntoRoutesBox: Send + Sync {
     fn into_routes(self: Box<Self>) -> Result<Vec<StaticRoute>, Error>;
 }
 
-// impl IntoRoutes for IntoRoutesBox {
-//     type Error = Error;
-
-//     fn into_routes(self) -> Result<Vec<StaticRoute>, Self::Error> {
-//         self.into_routes()
-//     }
-// }
-
 struct BoxedIntoRoutes<I>(I);
 
 impl<I> IntoRoutesBox for BoxedIntoRoutes<I>

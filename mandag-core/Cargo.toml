@@ -8,10 +8,12 @@ version = "0.1.0"
 [dependencies]
 async-trait = "0.1"
 dale = {git = "https://github.com/kildevaeld/dale-rs"}
-dale-http = {git = "https://github.com/kildevaeld/dale-rs", features = ["hyper"]}
+dale-http = {git = "https://github.com/kildevaeld/dale-rs", features = ["hyper", "json"]}
 hyper = {version = "0.14"}
 pin-project-lite = "0.2"
 thiserror = "1"
+
+serde = {version = "1"}
 
 [dev-dependencies]
 mandag-serve = {path = "../mandag-serve"}

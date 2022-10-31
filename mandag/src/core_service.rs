@@ -15,9 +15,6 @@ impl Service<Request> for CoreService {
     type Future = BoxFuture<'static, Self::Output>;
 
     fn call(&self, _req: Request) -> Self::Future {
-        Box::pin(async move {
-            //
-            Outcome::Success(Response::default())
-        })
+        Box::pin(async move { Outcome::Success(Response::default()) })
     }
 }

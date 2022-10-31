@@ -7,8 +7,13 @@ pub struct HandlerArgs {
 }
 
 #[derive(Debug, FromMeta)]
-pub struct RouteArgs {
+pub struct RouteDataArgs {
     pub path: String,
     #[darling(default)]
     pub data: Option<String>,
+}
+
+#[derive(Debug, FromMeta)]
+pub struct RouteArgs {
+    pub path: String,
 }

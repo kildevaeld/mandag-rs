@@ -1,4 +1,4 @@
-use super::shared::RouteArgs;
+use super::shared::{RouteArgs, RouteDataArgs};
 use crate::utils::{crate_ident_name, parse_route};
 use darling::{FromMeta, ToTokens};
 use proc_macro::TokenStream;
@@ -29,17 +29,8 @@ impl Method {
     }
 }
 
-pub fn create(attr: TokenStream, item: TokenStream, method: Method) -> TokenStream {
+pub fn route(item: TokenStream, method: Method, path: String, data: Option<String>) -> TokenStream {
     let crate_name = crate_ident_name("mandag");
-
-    let attr_args = parse_macro_input!(attr as AttributeArgs);
-
-    let RouteArgs { data, path } = match RouteArgs::from_list(&attr_args) {
-        Ok(v) => v,
-        Err(e) => {
-            return TokenStream::from(e.write_errors());
-        }
-    };
 
     let input = parse_macro_input!(item as ItemFn);
 
@@ -62,7 +53,6 @@ pub fn create(attr: TokenStream, item: TokenStream, method: Method) -> TokenStre
 
         impl #struct_name {
             const SEGMENTS: [#crate_name::router::Segment<'static>; #len] = [#(#segments_built),*];
-
             const NAME: &'static str = #route_name;
         }
 
@@ -90,4 +80,30 @@ pub fn create(attr: TokenStream, item: TokenStream, method: Method) -> TokenStre
         }
     )
     .into()
+}
+
+pub fn create(attr: TokenStream, item: TokenStream, method: Method) -> TokenStream {
+    let attr_args = parse_macro_input!(attr as AttributeArgs);
+
+    let RouteArgs { path } = match RouteArgs::from_list(&attr_args) {
+        Ok(v) => v,
+        Err(e) => {
+            return TokenStream::from(e.write_errors());
+        }
+    };
+
+    route(item, method, path, None)
+}
+
+pub fn create_with_data(attr: TokenStream, item: TokenStream, method: Method) -> TokenStream {
+    let attr_args = parse_macro_input!(attr as AttributeArgs);
+
+    let RouteDataArgs { data, path } = match RouteDataArgs::from_list(&attr_args) {
+        Ok(v) => v,
+        Err(e) => {
+            return TokenStream::from(e.write_errors());
+        }
+    };
+
+    route(item, method, path, data)
 }

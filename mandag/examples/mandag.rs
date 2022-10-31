@@ -1,5 +1,3 @@
-use std::convert::Infallible;
-
 use mandag::{
     async_trait, http::Request, prelude::*, router::Router, Core, Error, Extension, ExtensionCtx,
     Module, ModuleBuildCtx, Route,

@@ -2,7 +2,11 @@ use proc_macro::TokenStream;
 use router;
 use syn::parse_macro_input;
 
-pub fn segments(item: TokenStream) -> TokenStream {
+use crate::utils::{crate_ident_name, parse_route};
+
+pub fn create(item: TokenStream) -> TokenStream {
+    let crate_name = crate_ident_name("mandag");
+
     let lit = parse_macro_input!(item as syn::LitStr);
 
     let value = lit.value();
@@ -11,11 +15,11 @@ pub fn segments(item: TokenStream) -> TokenStream {
 
     let len = segments.len();
 
-    let segments = route::parse_route(segments);
+    let segments = parse_route(&crate_name, segments);
 
     quote::quote!(
         {
-            let segments: [daisy::router::Segment<'static>; #len] = [#(#segments),*];
+            let segments: [#crate_name::router::Segment<'static>; #len] = [#(#segments),*];
             segments
         }
     )

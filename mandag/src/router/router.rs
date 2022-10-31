@@ -1,13 +1,10 @@
-use std::{convert::Infallible, sync::Arc};
-
+use super::{IntoRoutes, StaticRoute};
+use crate::types::IntoService;
 use dale::{boxed::BoxFuture, BoxService, Outcome, Service};
 use dale_http::{error::Error, router::Params, Method, StatusCode};
 use mandag_core::{Body, Request, Response};
 use router::IntoRoutes as _;
-
-use crate::types::IntoService;
-
-use super::{IntoRoutes, StaticRoute};
+use std::{convert::Infallible, sync::Arc};
 
 pub struct RouteEntry {
     method: Method,

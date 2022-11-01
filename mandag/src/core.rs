@@ -7,9 +7,10 @@ use crate::{
 };
 use dale::{combinators::shared::SharedService, BoxService};
 use dale_http::error::Error;
+use johnfig::ConfigBuilder;
 use mandag_core::{Request, Response};
 use mandag_serve::ServiceServeExt;
-use std::net::SocketAddr;
+use std::{net::SocketAddr, path::PathBuf};
 
 pub struct Core<P: Phase> {
     phase: P,
@@ -37,6 +38,15 @@ impl Core<Init> {
         E: Extension<ExtensionContext> + 'static,
     {
         self.phase.extensions.push(Box::new(extension));
+        self
+    }
+
+    pub fn config_search_path(mut self, path: impl Into<PathBuf>) -> Self {
+        //
+        self.phase
+            .config
+            .add_search_path(path)
+            .expect("config search path");
         self
     }
 }

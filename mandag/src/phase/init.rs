@@ -6,16 +6,22 @@ use crate::{
 };
 use dale::{IntoOutcome, Service};
 use dale_http::error::Error;
+use johnfig::{Config, ConfigBuilder};
 use mandag_core::{Reply, Request};
 
 pub struct ExtensionContext {
     store: Store,
     routes: RoutesBuilder,
+    config: Config,
 }
 
 impl ExtensionCtx for ExtensionContext {
     fn store(&mut self) -> &mut Store {
         &mut self.store
+    }
+
+    fn config(&self) -> &Config {
+        &self.config
     }
 }
 
@@ -41,17 +47,34 @@ impl Routing for ExtensionContext {
     }
 }
 
-#[derive(Default)]
 pub struct Init {
     pub extensions: Vec<Box<dyn Extension<ExtensionContext>>>,
+    pub config: ConfigBuilder,
+}
+
+impl Default for Init {
+    fn default() -> Self {
+        Init {
+            extensions: Vec::default(),
+            config: ConfigBuilder::new().with_name_pattern("*.{ext}"),
+        }
+    }
 }
 
 impl Init {
     pub async fn build(self) -> Result<Build, Error> {
+        let config = self.config;
+
+        let cfg = tokio::task::spawn_blocking(move || config.build_config())
+            .await
+            .map_err(Error::new)?
+            .expect("config");
+
         let store = Store::new();
         let mut ctx = ExtensionContext {
             store,
             routes: RoutesBuilder::default(),
+            config: cfg,
         };
 
         for ext in &self.extensions {
@@ -62,6 +85,7 @@ impl Init {
             store: ctx.store,
             routes: ctx.routes,
             modules: Vec::default(),
+            config: ctx.config,
         };
 
         Ok(build)

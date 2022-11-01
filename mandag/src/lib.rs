@@ -1,6 +1,5 @@
 mod app;
 mod core;
-mod core_service;
 mod phase;
 mod store;
 mod types;

@@ -1,6 +1,5 @@
-use std::convert::Infallible;
-
 use mandag_core::{async_trait, FromRequest, Outcome, Request};
+use std::convert::Infallible;
 
 use crate::{app::App, prelude::RequestExt};
 

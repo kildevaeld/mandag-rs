@@ -15,7 +15,7 @@ impl Store {
 
     pub fn insert<S>(&mut self, i: S)
     where
-        S: Send + Sync + 'static,
+        S: Send + Sync + Clone + 'static,
     {
         self.i.write().insert(i);
     }

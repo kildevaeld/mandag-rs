@@ -5,6 +5,8 @@ mod phase;
 mod store;
 mod types;
 
+mod from_request;
+
 // Maybe move to core?
 mod extension;
 mod module;
@@ -13,7 +15,7 @@ mod request_ext;
 
 pub use mandag_macros::*;
 
-pub use mandag_core::{async_trait, Ext, Handler, Plugin, Reply};
+pub use mandag_core::{async_trait, Handler, Plugin, Reply};
 
 pub mod router;
 
@@ -38,7 +40,12 @@ pub mod prelude {
 pub mod http {
     pub use dale_http::{
         error::{Error, KnownError},
-        Method, Reply, StatusCode,
+        headers, HeaderMap, HeaderValue, Method, Reply, StatusCode,
     };
     pub use mandag_core::{Request, Response};
+}
+
+pub mod req {
+    pub use super::from_request::*;
+    pub use mandag_core::Ext;
 }

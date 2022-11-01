@@ -1,9 +1,12 @@
-use std::convert::Infallible;
-
+use crate::{error::GuardError, Request};
 use async_trait::async_trait;
 use dale::{IntoOutcome, IntoOutcomeExt};
-
-use crate::{error::GuardError, Request};
+use dale_http::headers::HeaderMapExt;
+use dale_http::headers::{
+    authorization::{Basic, Bearer},
+    Authorization, ContentLength, ContentType,
+};
+use std::convert::Infallible;
 
 pub type Outcome<T, E> = dale::Outcome<T, E, ()>;
 
@@ -31,6 +34,60 @@ impl<'a> FromRequest<'a> for &'a Request {
 
     async fn from_request(req: &'a Request) -> Self::Output {
         Outcome::Success(req)
+    }
+}
+
+#[async_trait]
+impl<'a> FromRequest<'a> for &'a dale_http::Uri {
+    type Error = Infallible;
+    type Output = Outcome<Self, Self::Error>;
+
+    async fn from_request(req: &'a Request) -> Self::Output {
+        Outcome::Success(req.uri())
+    }
+}
+
+#[async_trait]
+impl<'a> FromRequest<'a> for &'a dale_http::Method {
+    type Error = Infallible;
+    type Output = Outcome<Self, Self::Error>;
+
+    async fn from_request(req: &'a Request) -> Self::Output {
+        Outcome::Success(req.method())
+    }
+}
+
+#[async_trait]
+impl<'a, T> FromRequest<'a> for Option<T>
+where
+    T: FromRequest<'a>,
+{
+    type Error = T::Error;
+    type Output = Outcome<Self, Self::Error>;
+
+    async fn from_request(req: &'a Request) -> Self::Output {
+        match T::from_request(req).await.into_outcome() {
+            Outcome::Success(ret) => Outcome::Success(Some(ret)),
+            Outcome::Next(_) => Outcome::Success(None),
+            Outcome::Failure(err) => Outcome::Failure(err),
+        }
+    }
+}
+
+#[async_trait]
+impl<'a, T> FromRequest<'a> for Result<T, T::Error>
+where
+    T: FromRequest<'a>,
+{
+    type Error = T::Error;
+    type Output = Outcome<Self, Self::Error>;
+
+    async fn from_request(req: &'a Request) -> Self::Output {
+        match T::from_request(req).await.into_outcome() {
+            Outcome::Success(ret) => Outcome::Success(Ok(ret)),
+            Outcome::Next(_) => Outcome::Next(()),
+            Outcome::Failure(err) => Outcome::Success(Err(err)),
+        }
     }
 }
 
@@ -101,3 +158,23 @@ macro_rules! from_req {
 }
 
 from_req!(T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 T11 T12 T13 T14 T15 T16);
+
+macro_rules! headers {
+    ($($type: ty)*) => {
+        $(
+        #[async_trait]
+        impl<'a> FromRequest<'a> for $type {
+            type Error = Infallible;
+            type Output = Outcome<$type, Self::Error>;
+            async fn from_request(req: &'a Request) -> Self::Output {
+               match req.headers().typed_get::<$type>() {
+                Some(header) => Outcome::Success(header),
+                None => Outcome::Next(())
+               }
+            }
+        }
+        )*
+    };
+}
+
+headers!(ContentType ContentLength Authorization<Bearer> Authorization<Basic>);

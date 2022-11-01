@@ -27,7 +27,7 @@ pub fn create_handler(input: &ItemFn, data: &Option<String>) -> TokenStream {
         //
         match &data {
             Some(data) => data != &get_name(&item.pat),
-            None => false,
+            None => true,
         }
     };
 

@@ -2,13 +2,14 @@ use super::{Phase, Start};
 use crate::{
     app::App,
     module::{Module, ModuleBuildCtx},
-    router::{into_routes_box, IntoRoutesBox, Router},
+    router::{into_mounted_routes_box, into_routes_box, IntoRoutesBox, Router},
     store::Store,
     types::IntoService,
 };
 use dale::ServiceExt;
 use dale_extensions::StateMiddleware;
 use dale_http::error::Error;
+use router::AsSegments;
 
 #[derive(Default)]
 pub struct ModuleBuildContext {
@@ -22,6 +23,17 @@ impl ModuleBuildCtx for ModuleBuildContext {
         R::Error: std::error::Error + Send + Sync,
     {
         self.routes.push(into_routes_box(route));
+        self
+    }
+
+    fn mount<S, R>(&mut self, path: S, route: R) -> &mut Self
+    where
+        S: AsRef<str>,
+        R: crate::router::IntoRoutes + Sync + Send + 'static,
+        R::Error: std::error::Error + Send + Sync,
+    {
+        self.routes
+            .push(into_mounted_routes_box(path.as_ref().to_string(), route));
         self
     }
 }

@@ -13,7 +13,7 @@ pub struct Route<'a, P, S> {
     pub method: Method,
     pub service: S,
     pub segments: P,
-    _a: PhantomData<&'a fn()>,
+    pub(crate) _a: PhantomData<&'a fn()>,
 }
 
 impl<'a, P, S> Route<'a, P, S> {

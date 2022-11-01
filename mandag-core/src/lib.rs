@@ -5,11 +5,14 @@ mod handler;
 mod handler_service;
 mod types;
 
+mod plugin;
+
 pub use self::{
     error::*,
     from_body::{FromBody, Json},
     from_request::FromRequest,
     handler::*,
+    plugin::{Pluggable, Plugin},
     types::*,
 };
 

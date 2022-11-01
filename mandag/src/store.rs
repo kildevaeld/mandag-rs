@@ -20,7 +20,7 @@ impl Store {
         self.i.write().insert(i);
     }
 
-    pub fn get<S>(&mut self) -> Option<S>
+    pub fn get<S>(&self) -> Option<S>
     where
         S: Send + Clone + Sync + 'static,
     {

@@ -9,6 +9,10 @@ struct TestModule;
 #[async_trait]
 impl<C: ModuleBuildCtx> Module<C> for TestModule {
     async fn build(&self, ctx: &mut C) {
+        ctx.mount(
+            "/test",
+            Route::get("/module", |_| async move { "Hello, Module" }),
+        );
         ctx.route(Route::get("/module", |_| async move { "Hello, Module" }));
     }
 }
@@ -52,9 +56,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .route(test)
         .route(Route::get("/hello", index.service()))
         .route(Router::default())
-        .into_service()
-        .await?
-        .err_into::<dale_http::error::Error>()
         .listen(([127, 0, 0, 1], 3000))
         .await?;
 

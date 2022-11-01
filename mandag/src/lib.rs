@@ -13,7 +13,7 @@ mod request_ext;
 
 pub use mandag_macros::*;
 
-pub use mandag_core::{async_trait, Handler, Reply};
+pub use mandag_core::{async_trait, Handler, Plugin, Reply};
 
 pub mod router;
 
@@ -26,17 +26,17 @@ pub type Outcome = dale::Outcome<mandag_core::Response, Error, mandag_core::Requ
 pub use dale::Service;
 
 pub mod prelude {
-    pub use super::request_ext::RequestExt;
+    pub use super::{request_ext::RequestExt, router::IntoRoutesExt};
     pub use dale::{IntoOutcome, IntoOutcomeExt};
     pub use dale_http::prelude::*;
-    pub use mandag_core::HandlerExt;
+    pub use mandag_core::{HandlerExt, Pluggable};
     pub use mandag_serve::ServiceServeExt;
 }
 
 pub mod http {
     pub use dale_http::{
         error::{Error, KnownError},
-        Method, Reply,
+        Method, Reply, StatusCode,
     };
     pub use mandag_core::{Request, Response};
 }

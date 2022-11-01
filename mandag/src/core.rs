@@ -1,12 +1,16 @@
+use std::net::SocketAddr;
+
 use crate::{
     app::App,
     extension::Extension,
     phase::{Build, ExtensionContext, Init, ModuleBuildContext, Phase, Start},
     router::{into_routes_box, IntoRoutes, RouterService},
+    types::IntoService,
     Module,
 };
 use dale_extensions::State;
 use dale_http::error::Error;
+use mandag_serve::ServiceServeExt;
 
 pub struct Core<P: Phase> {
     phase: P,
@@ -62,18 +66,15 @@ impl Core<Build> {
     }
 
     pub async fn into_service(self) -> Result<State<RouterService, App>, Error> {
-        let service = self.create().await?;
-        let service = service.phase.service;
-        // let mut router = Router::default();
-        // for route in self.phase.routes {
-        //     let routes = route.into_routes()?;
-        //     for route in routes {
-        //         router.register(route)?;
-        //     }
-        // }
-
-        // let service = router.into_service().wrap(StateMiddleware::new(App {}));
+        let service = self.create().await?.phase.into_service();
 
         Ok(service)
+    }
+
+    pub async fn listen<I>(self, incoming: I) -> Result<(), Error>
+    where
+        I: Into<SocketAddr>,
+    {
+        Ok(self.into_service().await?.listen(incoming).await?)
     }
 }

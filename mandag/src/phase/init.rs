@@ -1,29 +1,42 @@
-use super::{Build, ModuleBuildContext, Phase};
+use super::{Build, Phase};
 use crate::{
     extension::{Extension, ExtensionCtx},
-    router::{into_routes_box, IntoRoutesBox},
+    router::{IntoRoutes, RoutesBuilder, Routing},
     store::Store,
-    Module,
 };
+use dale::{IntoOutcome, Service};
 use dale_http::error::Error;
+use mandag_core::{Reply, Request};
 
 pub struct ExtensionContext {
     store: Store,
-    routes: Vec<Box<dyn IntoRoutesBox>>,
-    modules: Vec<Box<dyn Module<ModuleBuildContext>>>,
+    routes: RoutesBuilder,
 }
 
 impl ExtensionCtx for ExtensionContext {
     fn store(&mut self) -> &mut Store {
         &mut self.store
     }
+}
 
+impl Routing for ExtensionContext {
     fn route<R>(&mut self, route: R) -> &mut Self
     where
-        R: crate::router::IntoRoutes + Sync + Send + 'static,
+        R: IntoRoutes + Sync + Send + 'static,
         R::Error: std::error::Error + Send + Sync,
     {
-        self.routes.push(into_routes_box(route));
+        self.routes.route(route);
+        self
+    }
+
+    fn service<S>(&mut self, service: S) -> &mut Self
+    where
+        S: Service<Request> + Send + Sync + 'static,
+        S::Future: Send,
+        <S::Output as IntoOutcome<Request>>::Success: Reply + Send,
+        <S::Output as IntoOutcome<Request>>::Failure: Into<Error>,
+    {
+        self.routes.service(service);
         self
     }
 }
@@ -38,8 +51,7 @@ impl Init {
         let store = Store::new();
         let mut ctx = ExtensionContext {
             store,
-            routes: Vec::default(),
-            modules: Vec::default(),
+            routes: RoutesBuilder::default(),
         };
 
         for ext in &self.extensions {
@@ -49,7 +61,7 @@ impl Init {
         let build = Build {
             store: ctx.store,
             routes: ctx.routes,
-            modules: ctx.modules,
+            modules: Vec::default(),
         };
 
         Ok(build)

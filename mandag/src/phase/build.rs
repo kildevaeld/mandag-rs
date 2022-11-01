@@ -2,78 +2,67 @@ use super::{Phase, Start};
 use crate::{
     app::App,
     module::{Module, ModuleBuildCtx},
-    router::{into_mounted_routes_box, into_routes_box, IntoRoutesBox, Router},
+    router::{IntoRoutes, RoutesBuilder, Routing},
     store::Store,
-    types::IntoService,
 };
-use dale::ServiceExt;
+use dale::{IntoOutcome, Service, ServiceExt};
 use dale_extensions::StateMiddleware;
 use dale_http::error::Error;
+use mandag_core::{Reply, Request};
 
 #[derive(Default)]
 pub struct ModuleBuildContext {
-    pub routes: Vec<Box<dyn IntoRoutesBox>>,
+    builder: RoutesBuilder,
 }
 
-impl ModuleBuildCtx for ModuleBuildContext {
+impl ModuleBuildCtx for ModuleBuildContext {}
+
+impl Routing for ModuleBuildContext {
     fn route<R>(&mut self, route: R) -> &mut Self
     where
-        R: crate::router::IntoRoutes + Sync + Send + 'static,
+        R: IntoRoutes + Sync + Send + 'static,
         R::Error: std::error::Error + Send + Sync,
     {
-        self.routes.push(into_routes_box(route));
+        self.builder.route(route);
         self
     }
 
-    fn mount<S, R>(&mut self, path: S, route: R) -> &mut Self
+    fn service<S>(&mut self, service: S) -> &mut Self
     where
-        S: AsRef<str>,
-        R: crate::router::IntoRoutes + Sync + Send + 'static,
-        R::Error: std::error::Error + Send + Sync,
+        S: Service<Request> + Send + Sync + 'static,
+        S::Future: Send,
+        <S::Output as IntoOutcome<Request>>::Success: Reply + Send,
+        <S::Output as IntoOutcome<Request>>::Failure: Into<Error>,
     {
-        self.routes
-            .push(into_mounted_routes_box(path.as_ref().to_string(), route));
+        self.builder.service(service);
         self
     }
 }
 
 pub struct Build {
     pub store: Store,
-    pub routes: Vec<Box<dyn IntoRoutesBox>>,
+    pub routes: RoutesBuilder,
     pub modules: Vec<Box<dyn Module<ModuleBuildContext>>>,
 }
 
 impl Build {
     pub async fn build(self) -> Result<Start, Error> {
         let store = self.store;
-        let mut router = Router::default();
-        for route in self.routes {
-            let routes = route.into_routes()?;
-            for route in routes {
-                router.register(route)?;
-            }
-        }
 
         let mut ctx = ModuleBuildContext {
-            routes: Vec::default(),
+            builder: self.routes,
         };
 
         for module in self.modules {
             module.build(&mut ctx).await;
         }
 
-        let routes = ctx.routes;
-
-        for route in routes {
-            let routes = route.into_routes()?;
-            for route in routes {
-                router.register(route)?;
-            }
-        }
-
-        let service = router
-            .into_service()
-            .wrap(StateMiddleware::new(App::new(store)));
+        let service = ctx
+            .builder
+            .into_service()?
+            .wrap(StateMiddleware::new(App::new(store)))
+            .boxed()
+            .shared();
 
         Ok(Start { service })
     }

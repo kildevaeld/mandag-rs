@@ -1,16 +1,15 @@
-use std::net::SocketAddr;
-
 use crate::{
-    app::App,
     extension::Extension,
     phase::{Build, ExtensionContext, Init, ModuleBuildContext, Phase, Start},
-    router::{into_routes_box, IntoRoutes, RouterService},
+    router::{IntoRoutes, Routing},
     types::IntoService,
     Module,
 };
-use dale_extensions::State;
+use dale::{combinators::shared::SharedService, BoxService};
 use dale_http::error::Error;
+use mandag_core::{Request, Response};
 use mandag_serve::ServiceServeExt;
+use std::net::SocketAddr;
 
 pub struct Core<P: Phase> {
     phase: P,
@@ -48,7 +47,7 @@ impl Core<Build> {
         R: IntoRoutes + Sync + Send + 'static,
         R::Error: std::error::Error + Send + Sync,
     {
-        self.phase.routes.push(into_routes_box(route));
+        self.phase.routes.route(route);
         self
     }
 
@@ -65,9 +64,10 @@ impl Core<Build> {
         Ok(Core { phase: start })
     }
 
-    pub async fn into_service(self) -> Result<State<RouterService, App>, Error> {
+    pub async fn into_service(
+        self,
+    ) -> Result<SharedService<BoxService<'static, Request, Response, Error>>, Error> {
         let service = self.create().await?.phase.into_service();
-
         Ok(service)
     }
 

@@ -13,7 +13,7 @@ impl<C: ModuleBuildCtx> Module<C> for TestModule {
             "/test",
             Route::get("/module", |_| async move { "Hello, Module" }),
         );
-        ctx.route(Route::get("/module", |_| async move { "Hello, Module" }));
+        ctx.get("/module", |_| async move { "Hello, Module" });
     }
 }
 

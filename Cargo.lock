@@ -93,7 +93,7 @@ dependencies = [
 [[package]]
 name = "dale"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#1e38479a0d7a84ab44c312bdc5ba5ed17e337d76"
+source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
 dependencies = [
  "either",
  "futures-core",
@@ -104,7 +104,7 @@ dependencies = [
 [[package]]
 name = "dale-extensions"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#1e38479a0d7a84ab44c312bdc5ba5ed17e337d76"
+source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
 dependencies = [
  "dale",
  "http",
@@ -114,7 +114,7 @@ dependencies = [
 [[package]]
 name = "dale-fs"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#1e38479a0d7a84ab44c312bdc5ba5ed17e337d76"
+source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
 dependencies = [
  "bitflags",
  "dale",
@@ -131,7 +131,7 @@ dependencies = [
 [[package]]
 name = "dale-http"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#1e38479a0d7a84ab44c312bdc5ba5ed17e337d76"
+source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
 dependencies = [
  "bytes",
  "dale",
@@ -156,7 +156,7 @@ dependencies = [
 [[package]]
 name = "dale-runtime"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#1e38479a0d7a84ab44c312bdc5ba5ed17e337d76"
+source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
 dependencies = [
  "async-compat",
  "async-trait",

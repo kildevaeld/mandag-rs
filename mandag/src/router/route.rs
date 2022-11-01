@@ -10,9 +10,9 @@ pub type StaticRoute =
     Route<'static, Segments<'static>, BoxService<'static, Request, Response, Error>>;
 
 pub struct Route<'a, P, S> {
-    pub method: Method,
-    pub service: S,
-    pub segments: P,
+    pub(crate) method: Method,
+    pub(crate) service: S,
+    pub(crate) segments: P,
     pub(crate) _a: PhantomData<&'a fn()>,
 }
 

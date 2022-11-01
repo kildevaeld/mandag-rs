@@ -30,7 +30,10 @@ pub use dale::Service;
 pub use dale_http::reply;
 
 pub mod prelude {
-    pub use super::{request_ext::RequestExt, router::IntoRoutesExt};
+    pub use super::{
+        request_ext::RequestExt,
+        router::{IntoRoutesExt, Routing, RoutingExt},
+    };
     pub use dale::{IntoOutcome, IntoOutcomeExt};
     pub use dale_http::prelude::*;
     pub use mandag_core::{HandlerExt, Pluggable};

@@ -25,6 +25,8 @@ pub type Outcome = dale::Outcome<mandag_core::Response, Error, mandag_core::Requ
 
 pub use dale::Service;
 
+pub use dale_http::reply;
+
 pub mod prelude {
     pub use super::{request_ext::RequestExt, router::IntoRoutesExt};
     pub use dale::{IntoOutcome, IntoOutcomeExt};

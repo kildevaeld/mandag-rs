@@ -2,7 +2,7 @@ use mandag::{
     async_trait, http::Request, prelude::*, router::Router, Core, Error, Extension, ExtensionCtx,
     Module, ModuleBuildCtx, Route,
 };
-use mandag_core::Body;
+use mandag_core::{Body, Json};
 
 struct TestModule;
 
@@ -20,6 +20,11 @@ fn index(data: Body) {
 
 #[mandag::get(path = "/mig/:sub")]
 fn test() {
+    "Mif"
+}
+
+#[mandag::post(path = "/mig/:sub", data = "data")]
+fn post(data: Json<String>) {
     "Mif"
 }
 

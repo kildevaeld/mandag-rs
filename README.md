@@ -23,6 +23,7 @@ async fn main() -> mandag::Result<()> {
 
     mandag::start()
         .config("./config")
+        .attach()
         .build().await?
         .route((index, about))
         .listen(([127,0,0,1], 3000)).await

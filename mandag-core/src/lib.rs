@@ -10,7 +10,7 @@ mod plugin;
 pub use self::{
     error::*,
     from_body::{FromBody, Json},
-    from_request::FromRequest,
+    from_request::{Ext, FromRequest},
     handler::*,
     plugin::{Pluggable, Plugin},
     types::*,

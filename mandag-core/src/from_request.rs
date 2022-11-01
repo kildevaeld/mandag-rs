@@ -34,7 +34,30 @@ impl<'a> FromRequest<'a> for &'a Request {
     }
 }
 
+pub struct Ext<'a, T>(&'a T);
 
+impl<'a, T> std::ops::Deref for Ext<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        self.0
+    }
+}
+
+#[async_trait]
+impl<'a, T> FromRequest<'a> for Ext<'a, T>
+where
+    T: Send + Sync + 'static,
+{
+    type Error = Infallible;
+    type Output = Outcome<Self, Self::Error>;
+    async fn from_request(req: &'a Request) -> Self::Output {
+        match req.extensions().get() {
+            Some(found) => Outcome::Success(Ext(found)),
+            None => dale::Outcome::Next(()),
+        }
+    }
+}
 
 macro_rules! from_req {
     ($type: ident) => {

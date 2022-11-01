@@ -13,7 +13,7 @@ mod request_ext;
 
 pub use mandag_macros::*;
 
-pub use mandag_core::{async_trait, Handler, Plugin, Reply};
+pub use mandag_core::{async_trait, Ext, Handler, Plugin, Reply};
 
 pub mod router;
 

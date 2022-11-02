@@ -427,7 +427,7 @@ checksum = "4217ad341ebadf8d8e724e264f13e593e0648f5b3e94b3896a5df283be015ecc"
 [[package]]
 name = "johnfig"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/johnfig-rs#7e21f792c4b666d919ce67b23d5d32cf93ea6c5c"
+source = "git+https://github.com/kildevaeld/johnfig-rs#f86befe6961e54c77f7dfe5a9ed1f80de069755e"
 dependencies = [
  "glob",
  "log",

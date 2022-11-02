@@ -1,4 +1,5 @@
 mod handle;
+mod module_impl;
 mod route;
 mod segments;
 mod shared;
@@ -14,6 +15,11 @@ pub fn segments(item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn handler(attr: TokenStream, item: TokenStream) -> TokenStream {
     handle::create(attr, item).into()
+}
+
+#[proc_macro_attribute]
+pub fn module(attr: TokenStream, item: TokenStream) -> TokenStream {
+    module_impl::create(attr, item).into()
 }
 
 macro_rules! methods {

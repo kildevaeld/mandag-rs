@@ -7,7 +7,6 @@ use crate::{
 };
 use dale::{combinators::shared::SharedService, BoxService};
 use dale_http::error::Error;
-use johnfig::ConfigBuilder;
 use mandag_core::{Request, Response};
 use mandag_serve::ServiceServeExt;
 use std::{net::SocketAddr, path::PathBuf};
@@ -88,3 +87,25 @@ impl Core<Build> {
         Ok(self.into_service().await?.listen(incoming).await?)
     }
 }
+
+// impl Routing for Core<Build> {
+//     fn route<R>(&mut self, route: R) -> &mut Self
+//     where
+//         R: IntoRoutes + Sync + Send + 'static,
+//         R::Error: std::error::Error + Send + Sync,
+//     {
+//         self.phase.routes.route(route);
+//         self
+//     }
+
+//     fn service<S>(&mut self, service: S) -> &mut Self
+//     where
+//         S: dale::Service<Request> + Send + Sync + 'static,
+//         S::Future: Send,
+//         <S::Output as dale::IntoOutcome<Request>>::Success: mandag_core::Reply + Send,
+//         <S::Output as dale::IntoOutcome<Request>>::Failure: Into<Error>,
+//     {
+//         self.phase.routes.service(service);
+//         self
+//     }
+// }

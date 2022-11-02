@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::shared::{RouteArgs, RouteDataArgs};
 use crate::utils::{crate_ident_name, parse_route};
 use darling::{FromMeta, ToTokens};
@@ -29,10 +31,28 @@ impl Method {
     }
 }
 
-pub fn route(item: TokenStream, method: Method, path: String, data: Option<String>) -> TokenStream {
-    let crate_name = crate_ident_name("mandag");
+impl FromStr for Method {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let method = match s {
+            "get" => Method::Get,
+            "post" => Method::Post,
+            "patch" => Method::Patch,
+            "put" => Method::Put,
+            "delete" => Method::Delete,
+            _ => return Err(format!("method not found: {}", s)),
+        };
+        Ok(method)
+    }
+}
 
-    let input = parse_macro_input!(item as ItemFn);
+pub fn route(
+    input: &ItemFn,
+    method: Method,
+    path: String,
+    data: Option<String>,
+) -> proc_macro2::TokenStream {
+    let crate_name = crate_ident_name("mandag");
 
     let handler: proc_macro2::TokenStream = crate::handle::create_handler(&input, &data).into();
 
@@ -92,7 +112,9 @@ pub fn create(attr: TokenStream, item: TokenStream, method: Method) -> TokenStre
         }
     };
 
-    route(item, method, path, None)
+    let item = parse_macro_input!(item as ItemFn);
+
+    route(&item, method, path, None).into()
 }
 
 pub fn create_with_data(attr: TokenStream, item: TokenStream, method: Method) -> TokenStream {
@@ -105,5 +127,7 @@ pub fn create_with_data(attr: TokenStream, item: TokenStream, method: Method) ->
         }
     };
 
-    route(item, method, path, data)
+    let item = parse_macro_input!(item as ItemFn);
+
+    route(&item, method, path, data).into()
 }

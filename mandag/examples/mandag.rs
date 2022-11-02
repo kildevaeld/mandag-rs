@@ -8,12 +8,14 @@ struct TestModule;
 
 #[async_trait]
 impl<C: ModuleBuildCtx> Module<C> for TestModule {
-    async fn build(&self, ctx: &mut C) {
+    async fn build(&self, ctx: &mut C) -> Result<(), Error> {
         ctx.mount(
             "/test",
             Route::get("/module", |_| async move { "Hello, Module" }),
         );
         ctx.get("/module", |_| async move { "Hello, Module" });
+
+        Ok(())
     }
 }
 

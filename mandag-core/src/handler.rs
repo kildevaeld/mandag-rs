@@ -1,6 +1,5 @@
+use crate::{body::FromBody, handler_service::HandlerService, req::FromRequest, Reply};
 use async_trait::async_trait;
-
-use crate::{from_body::FromBody, handler_service::HandlerService, FromRequest, Reply};
 
 #[async_trait]
 pub trait Handler<'r>: Send + Sync {

@@ -1,15 +1,7 @@
-use std::convert::Infallible;
-
+use super::{Body, FromBody};
 use async_trait::async_trait;
 use dale_http::{prelude::BodyExt, Bytes};
-use hyper::Body;
-
-#[async_trait]
-pub trait FromBody: Sized + Send {
-    type Error: Send;
-
-    async fn from_body(body: Body) -> Result<Self, Self::Error>;
-}
+use std::convert::Infallible;
 
 #[async_trait]
 impl FromBody for Body {

@@ -7,16 +7,25 @@ version = "0.1.0"
 
 [dependencies]
 async-trait = "0.1"
-dale = {git = "https://github.com/kildevaeld/dale-rs"}
-dale-extensions = {git = "https://github.com/kildevaeld/dale-rs", features = ["http"]}
-dale-http = {git = "https://github.com/kildevaeld/dale-rs", features = ["hyper", "json"]}
+dale = { git = "https://github.com/kildevaeld/dale-rs" }
+dale-extensions = { git = "https://github.com/kildevaeld/dale-rs", features = [
+    "http",
+] }
+dale-http = { git = "https://github.com/kildevaeld/dale-rs", features = [
+    "hyper",
+    "json",
+    "router",
+] }
+johnfig = { git = "https://github.com/kildevaeld/johnfig-rs", default-features = false }
 
-hyper = {version = "0.14"}
+hyper = { version = "0.14" }
 pin-project-lite = "0.2"
 thiserror = "1"
 
-serde = {version = "1"}
+serde = { version = "1" }
+
+router = { git = "https://github.com/kildevaeld/router-rs" }
 
 [dev-dependencies]
-mandag-serve = {path = "../mandag-serve"}
-tokio = {version = "1", features = ["rt", "macros"]}
+mandag-serve = { path = "../mandag-serve" }
+tokio = { version = "1", features = ["rt", "macros"] }

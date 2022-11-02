@@ -2,7 +2,7 @@ use mandag::{
     async_trait, http::Request, prelude::*, router::Router, Core, Error, Extension, ExtensionCtx,
     Module, ModuleBuildCtx, Route,
 };
-use mandag_core::{Body, Json};
+use mandag_core::{body::Json, Body};
 
 struct TestModule;
 
@@ -38,7 +38,7 @@ struct TestExt;
 
 #[async_trait]
 impl<C: ExtensionCtx> Extension<C> for TestExt {
-    async fn init(&self, _ctx: &mut C) -> Result<(), Error> {
+    async fn build(&self, _ctx: &mut C) -> Result<(), Error> {
         println!("init extension");
         Ok(())
     }

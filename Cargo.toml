@@ -4,5 +4,6 @@ members = [
   "mandag-core",
   "mandag-serve",
   "mandag-macros",
+  "mandag-statics",
   "mandag",
 ]

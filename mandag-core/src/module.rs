@@ -1,10 +1,13 @@
 use crate::router::Routing;
+use async_trait::async_trait;
 use dale_http::Error;
 use johnfig::Config;
-use mandag_core::async_trait;
 
 pub trait ModuleBuildCtx: Routing + Send + Sync {
     fn config(&self) -> &Config;
+    fn get<S>(&self) -> Option<S>
+    where
+        S: Send + Clone + Sync + 'static;
 }
 
 #[async_trait]

@@ -1,13 +1,15 @@
 use super::{Build, Phase};
 use crate::{
-    extension::{Extension, ExtensionCtx},
-    router::{IntoRoutes, RoutesBuilder, Routing},
     store::Store,
+    {Extension, ExtensionCtx},
 };
 use dale::{IntoOutcome, Service};
 use dale_http::error::Error;
 use johnfig::{Config, ConfigBuilder};
-use mandag_core::{Reply, Request};
+use mandag_core::{
+    router::{IntoRoutes, RoutesBuilder, Routing},
+    Reply, Request,
+};
 
 pub struct ExtensionContext {
     store: Store,
@@ -16,10 +18,12 @@ pub struct ExtensionContext {
 }
 
 impl ExtensionCtx for ExtensionContext {
-    fn store(&mut self) -> &mut Store {
-        &mut self.store
+    fn register<S>(&mut self, i: S)
+    where
+        S: Send + Sync + Clone + 'static,
+    {
+        self.store.insert(i)
     }
-
     fn config(&self) -> &Config {
         &self.config
     }
@@ -78,7 +82,7 @@ impl Init {
         };
 
         for ext in &self.extensions {
-            ext.init(&mut ctx).await?;
+            ext.build(&mut ctx).await?;
         }
 
         let build = Build {

@@ -1,25 +1,34 @@
 use super::{Phase, Start};
 use crate::{
     app::App,
-    module::{Module, ModuleBuildCtx},
-    router::{IntoRoutes, RoutesBuilder, Routing},
     store::Store,
+    {Module, ModuleBuildCtx},
 };
-use dale::{IntoOutcome, Service, ServiceExt};
+use dale::{IntoOutcome, IntoService, Service, ServiceExt};
 use dale_extensions::StateMiddleware;
 use dale_http::error::Error;
 use johnfig::Config;
-use mandag_core::{Reply, Request};
+use mandag_core::{
+    router::{IntoRoutes, RoutesBuilder, Routing},
+    Reply, Request,
+};
 
-#[derive(Default)]
 pub struct ModuleBuildContext {
     builder: RoutesBuilder,
     config: Config,
+    store: Store,
 }
 
 impl ModuleBuildCtx for ModuleBuildContext {
     fn config(&self) -> &Config {
         &self.config
+    }
+
+    fn get<S>(&self) -> Option<S>
+    where
+        S: Send + Clone + Sync + 'static,
+    {
+        self.store.get()
     }
 }
 
@@ -59,16 +68,17 @@ impl Build {
         let mut ctx = ModuleBuildContext {
             builder: self.routes,
             config: self.config,
+            store,
         };
 
         for module in self.modules {
-            module.build(&mut ctx).await;
+            module.build(&mut ctx).await?;
         }
 
         let service = ctx
             .builder
             .into_service()?
-            .wrap(StateMiddleware::new(App::new(store, ctx.config)))
+            .wrap(StateMiddleware::new(App::new(ctx.store, ctx.config)))
             .boxed()
             .shared();
 

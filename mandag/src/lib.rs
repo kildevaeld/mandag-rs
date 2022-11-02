@@ -6,19 +6,18 @@ mod types;
 
 mod from_request;
 
-// Maybe move to core?
-mod extension;
-mod module;
-
 mod request_ext;
 
 pub use mandag_macros::*;
 
-pub use mandag_core::{async_trait, Handler, Plugin, Reply};
+pub use mandag_core::{
+    async_trait, router::Route, Extension, ExtensionCtx, Handler, Module, ModuleBuildCtx, Plugin,
+    Reply,
+};
 
-pub mod router;
+pub use mandag_core::router;
 
-pub use self::{core::Core, extension::*, module::*, router::Route};
+pub use self::core::Core;
 
 pub use dale_http::error::Error;
 
@@ -29,25 +28,21 @@ pub use dale::Service;
 pub use dale_http::reply;
 
 pub mod prelude {
-    pub use super::{
-        request_ext::RequestExt,
-        router::{IntoRoutesExt, Routing, RoutingExt},
-    };
-    pub use dale::{IntoOutcome, IntoOutcomeExt};
-    pub use dale_http::prelude::*;
-    pub use mandag_core::{HandlerExt, Pluggable};
+    pub use super::request_ext::RequestExt;
+
+    pub use mandag_core::prelude::*;
     pub use mandag_serve::ServiceServeExt;
 }
 
 pub mod http {
-    pub use dale_http::{
-        error::{Error, KnownError},
-        headers, HeaderMap, HeaderValue, Method, Reply, StatusCode,
-    };
-    pub use mandag_core::{Request, Response};
+    pub use mandag_core::http::*;
 }
 
 pub mod req {
     pub use super::from_request::*;
-    pub use mandag_core::Ext;
+    pub use mandag_core::req::*;
+}
+
+pub mod body {
+    pub use mandag_core::body::*;
 }

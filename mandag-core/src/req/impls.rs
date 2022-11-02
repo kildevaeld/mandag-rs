@@ -1,3 +1,4 @@
+use super::FromRequest;
 use crate::{error::GuardError, Request};
 use async_trait::async_trait;
 use dale::{IntoOutcome, IntoOutcomeExt};
@@ -9,13 +10,6 @@ use dale_http::headers::{
 use std::convert::Infallible;
 
 pub type Outcome<T, E> = dale::Outcome<T, E, ()>;
-
-#[async_trait]
-pub trait FromRequest<'a>: Sized + Send {
-    type Error: Into<GuardError> + Send;
-    type Output: IntoOutcome<(), Success = Self, Failure = Self::Error> + Send;
-    async fn from_request(req: &'a Request) -> Self::Output;
-}
 
 #[async_trait]
 impl<'a> FromRequest<'a> for () {

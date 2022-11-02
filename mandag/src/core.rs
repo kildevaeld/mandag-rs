@@ -1,13 +1,14 @@
 use crate::{
-    extension::Extension,
     phase::{Build, ExtensionContext, Init, ModuleBuildContext, Phase, Start},
-    router::{IntoRoutes, Routing},
     types::IntoService,
-    Module,
+    Extension, Module,
 };
 use dale::{combinators::shared::SharedService, BoxService};
 use dale_http::error::Error;
-use mandag_core::{Request, Response};
+use mandag_core::{
+    router::{IntoRoutes, Routing},
+    Request, Response,
+};
 use mandag_serve::ServiceServeExt;
 use std::{net::SocketAddr, path::PathBuf};
 

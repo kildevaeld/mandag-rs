@@ -108,7 +108,7 @@ dependencies = [
 [[package]]
 name = "dale"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
+source = "git+https://github.com/kildevaeld/dale-rs#f193ae2c95b844b2053fc03eb13f7b560dd8791e"
 dependencies = [
  "either",
  "futures-core",
@@ -119,7 +119,7 @@ dependencies = [
 [[package]]
 name = "dale-extensions"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
+source = "git+https://github.com/kildevaeld/dale-rs#f193ae2c95b844b2053fc03eb13f7b560dd8791e"
 dependencies = [
  "dale",
  "http",
@@ -129,7 +129,7 @@ dependencies = [
 [[package]]
 name = "dale-fs"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
+source = "git+https://github.com/kildevaeld/dale-rs#f193ae2c95b844b2053fc03eb13f7b560dd8791e"
 dependencies = [
  "bitflags",
  "dale",
@@ -146,7 +146,7 @@ dependencies = [
 [[package]]
 name = "dale-http"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
+source = "git+https://github.com/kildevaeld/dale-rs#f193ae2c95b844b2053fc03eb13f7b560dd8791e"
 dependencies = [
  "bytes",
  "dale",
@@ -171,7 +171,7 @@ dependencies = [
 [[package]]
 name = "dale-runtime"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/dale-rs#a69697eacd06c6f002d8265fe9abe68b8686fe78"
+source = "git+https://github.com/kildevaeld/dale-rs#f193ae2c95b844b2053fc03eb13f7b560dd8791e"
 dependencies = [
  "async-compat",
  "async-trait",
@@ -493,8 +493,10 @@ dependencies = [
  "dale-extensions",
  "dale-http",
  "hyper",
+ "johnfig",
  "mandag-serve",
  "pin-project-lite",
+ "router",
  "serde",
  "thiserror",
  "tokio",
@@ -522,6 +524,10 @@ dependencies = [
  "pin-project-lite",
  "tokio",
 ]
+
+[[package]]
+name = "mandag-statics"
+version = "0.1.0"
 
 [[package]]
 name = "memchr"
@@ -728,7 +734,7 @@ dependencies = [
 [[package]]
 name = "router"
 version = "0.2.1"
-source = "git+https://github.com/kildevaeld/router-rs#d57b7661acea5240db6c146d902367a30e8a0595"
+source = "git+https://github.com/kildevaeld/router-rs#168bd70bb71a0eb2d9aa743c225601deea041977"
 dependencies = [
  "generational-arena",
  "peg",

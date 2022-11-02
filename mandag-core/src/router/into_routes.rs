@@ -1,9 +1,6 @@
+use super::route::{Route, StaticRoute};
 use dale_http::error::Error;
 use router::{AsSegments, Segments};
-
-use crate::Route;
-
-use super::route::StaticRoute;
 
 pub trait IntoRoute {
     type Error;

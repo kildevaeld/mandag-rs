@@ -1,6 +1,6 @@
+use crate::{Reply, Request, Response};
 use dale::{BoxService, IntoOutcome, Service, ServiceExt};
 use dale_http::{error::Error, Method, Reply as _};
-use mandag_core::{Reply, Request, Response};
 use router::{AsSegments, Segments};
 use std::marker::PhantomData;
 

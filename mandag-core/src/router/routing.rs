@@ -1,8 +1,8 @@
 use super::{into_routes_box, IntoRoutes, IntoRoutesBox, IntoRoutesExt, Route, Router};
-use crate::types::IntoService;
+use crate::{Reply, Request, Response};
+use dale::IntoService;
 use dale::{BoxService, IntoOutcome, Service, ServiceExt, VecService};
 use dale_http::{Error, Method, Reply as _};
-use mandag_core::{Reply, Request, Response};
 
 pub trait Routing {
     fn route<R>(&mut self, route: R) -> &mut Self
@@ -40,7 +40,7 @@ pub trait RoutingExt: Routing {
     fn mount<S, R>(&mut self, path: S, route: R) -> &mut Self
     where
         S: ToString,
-        R: crate::router::IntoRoutes + Sync + Send + 'static,
+        R: IntoRoutes + Sync + Send + 'static,
         R::Error: std::error::Error + Send + Sync,
     {
         self.route(route.mounted_on(path))
@@ -71,8 +71,10 @@ impl RoutesBuilder {
     }
 }
 
-impl RoutesBuilder {
-    pub fn into_service(self) -> Result<BoxService<'static, Request, Response, Error>, Error> {
+impl IntoService<Request> for RoutesBuilder {
+    type Error = Error;
+    type Service = BoxService<'static, Request, Response, Error>;
+    fn into_service(self) -> Result<Self::Service, Self::Error> {
         let service = VecService::new(self.services);
 
         let mut router = Router::default();
@@ -83,7 +85,7 @@ impl RoutesBuilder {
             }
         }
 
-        let service = service.or(router.into_service()).unify().boxed();
+        let service = service.or(router.into_service()?).unify().boxed();
 
         Ok(service)
     }

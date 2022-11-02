@@ -2,7 +2,7 @@ use dale::{boxed::BoxFuture, IntoOutcome, Outcome, Service};
 use dale_http::{error::Error, Reply};
 use hyper::Body;
 
-use crate::{from_body::FromBody, handler::Handler, FromRequest, Request, Response};
+use crate::{body::FromBody, handler::Handler, req::FromRequest, Request, Response};
 
 #[derive(Debug, Clone, Copy)]
 pub struct HandlerService<H>(pub H);

@@ -1,8 +1,8 @@
 use super::{IntoRoutes, StaticRoute};
-use crate::types::IntoService;
+use crate::{Body, Request, Response};
+use dale::IntoService;
 use dale::{boxed::BoxFuture, BoxService, Outcome, Service};
 use dale_http::{error::Error, router::Params, Method, StatusCode};
-use mandag_core::{Body, Request, Response};
 use router::IntoRoutes as _;
 use std::{convert::Infallible, sync::Arc};
 
@@ -62,11 +62,12 @@ impl IntoRoutes for Router {
 }
 
 impl IntoService<Request> for Router {
+    type Error = Infallible;
     type Service = RouterService;
-    fn into_service(self) -> Self::Service {
-        RouterService {
+    fn into_service(self) -> Result<Self::Service, Self::Error> {
+        Ok(RouterService {
             router: Arc::new(self.i),
-        }
+        })
     }
 }
 

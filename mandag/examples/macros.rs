@@ -5,6 +5,11 @@ mod api {
     pub fn index() {
         "Hello, World!"
     }
+
+    #[get(path = "/")]
+    pub fn indexes() {
+        "Hello, World!"
+    }
 }
 
 #[tokio::main(flavor = "current_thread")]

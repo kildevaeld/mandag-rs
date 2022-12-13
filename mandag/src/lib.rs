@@ -1,12 +1,6 @@
-mod app;
 mod core;
 mod phase;
-mod store;
 mod types;
-
-mod from_request;
-
-mod request_ext;
 
 pub use mandag_macros::*;
 
@@ -28,8 +22,6 @@ pub use dale::Service;
 pub use dale_http::reply;
 
 pub mod prelude {
-    pub use super::request_ext::RequestExt;
-
     pub use mandag_core::prelude::*;
     pub use mandag_serve::ServiceServeExt;
 }
@@ -39,7 +31,6 @@ pub mod http {
 }
 
 pub mod req {
-    pub use super::from_request::*;
     pub use mandag_core::req::*;
 }
 

@@ -13,7 +13,7 @@ struct AppInner {
 pub struct App(Arc<AppInner>);
 
 impl App {
-    pub(crate) fn new(store: Store, config: Config) -> App {
+    pub fn new(store: Store, config: Config) -> App {
         App(Arc::new(AppInner { store, config }))
     }
 

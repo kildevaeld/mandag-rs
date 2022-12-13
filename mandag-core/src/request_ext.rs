@@ -1,5 +1,4 @@
-use mandag_core::Request;
-
+use super::Request;
 use crate::app::App;
 
 mod sealed {

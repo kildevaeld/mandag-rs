@@ -26,6 +26,9 @@ serde = { version = "1" }
 
 router = { git = "https://github.com/kildevaeld/router-rs" }
 
+http = { version = "0.2" }
+parking_lot = { version = "0.12"}
+
 [dev-dependencies]
 mandag-serve = { path = "../mandag-serve" }
 tokio = { version = "1", features = ["rt", "macros"] }

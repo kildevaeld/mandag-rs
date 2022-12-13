@@ -4,6 +4,9 @@ name = "mandag"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = []
+serde = ["dale-http/json", "dale-http/qs"]
 
 [dependencies]
 dale = { git = "https://github.com/kildevaeld/dale-rs", features = ["alloc"] }
@@ -32,3 +35,11 @@ pin-project-lite = "0.2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt", "macros"] }
+serde = { version = "1", features = ["derive"]}
+mandag-tera = { path = "../mandag-tera"}
+
+
+[[example]]
+name = "todos"
+path = "examples/todo/main.rs"
+required-features = ["serde"]

@@ -1,9 +1,9 @@
-use std::{future::Future, process::Output, sync::Arc};
+use std::{future::Future, sync::Arc};
 
 use mandag_core::{
     async_trait,
     dale::Service,
-    http::{reply, Body, Error, Reply},
+    http::{reply, Error},
     prelude::*,
     Extension, ExtensionCtx, Request,
 };

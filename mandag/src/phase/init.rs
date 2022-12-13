@@ -1,14 +1,11 @@
 use super::{Build, Phase};
-use crate::{
-    store::Store,
-    {Extension, ExtensionCtx},
-};
+use crate::{Extension, ExtensionCtx};
 use dale::{IntoOutcome, Service};
 use dale_http::error::Error;
 use johnfig::{Config, ConfigBuilder};
 use mandag_core::{
     router::{IntoRoutes, RoutesBuilder, Routing},
-    Reply, Request,
+    Reply, Request, Store,
 };
 
 pub struct ExtensionContext {

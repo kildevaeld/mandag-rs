@@ -77,7 +77,7 @@ pub fn create_handler(input: &ItemFn, data: &Option<String>) -> TokenStream {
 
             type Data = #data_type;
             type Output = #crate_name::http::Response;
-            type Error = #crate_name::http::Error;
+            type Error = #crate_name::http::HttpError;
 
 
             async fn handle(&'r self, input: Self::Input, #data_arg: Self::Data) -> Result<Self::Output, Self::Error> {

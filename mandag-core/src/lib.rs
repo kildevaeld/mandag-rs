@@ -31,7 +31,8 @@ pub use async_trait::async_trait;
 pub mod http {
     pub use super::types::{Body, Request, Response};
     pub use dale_http::{
-        headers::*, reply, Error, HeaderMap, KnownError, Method, Reply, StatusCode, Uri,
+        headers::*, reply, Error as HttpError, HeaderMap, KnownError, Method, Reply, StatusCode,
+        Uri,
     };
 }
 

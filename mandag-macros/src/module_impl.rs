@@ -39,7 +39,7 @@ pub fn create(_attr: TokenStream, item: TokenStream) -> TokenStream {
             pub struct #struct_name;
 
             impl #crate_name::router::IntoRoutes for #struct_name {
-                type Error = #crate_name::http::Error;
+                type Error = #crate_name::http::HttpError;
 
                 fn into_routes(self) -> Result<Vec<#crate_name::router::StaticRoute>, Self::Error> {
                     let mut routes = vec![];

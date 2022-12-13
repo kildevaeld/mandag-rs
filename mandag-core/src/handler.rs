@@ -1,5 +1,6 @@
-use crate::{body::FromBody, handler_service::HandlerService, req::FromRequest, Reply};
+use crate::{body::FromBody, handler_service::HandlerService, req::FromRequest, Reply, Response};
 use async_trait::async_trait;
+use dale_http::Error;
 
 #[async_trait]
 pub trait Handler<'r>: Send + Sync {

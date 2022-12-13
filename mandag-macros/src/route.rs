@@ -78,7 +78,7 @@ pub fn route(
 
         impl #crate_name::router::IntoRoute for #struct_name {
 
-            type Error = #crate_name::http::Error;
+            type Error = #crate_name::http::HttpError;
 
             fn into_route(self) -> Result<#crate_name::router::StaticRoute, Self::Error> {
                 use #crate_name::prelude::*;
@@ -91,7 +91,7 @@ pub fn route(
 
 
         {
-            type Error = #crate_name::http::Error;
+            type Error = #crate_name::http::HttpError;
 
             fn into_routes(self) -> Result<Vec<#crate_name::router::StaticRoute>, Self::Error> {
                 let route =  <#struct_name as #crate_name::router::IntoRoute>::into_route(self)?;

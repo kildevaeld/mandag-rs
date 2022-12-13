@@ -3,7 +3,7 @@ use std::{future::Future, sync::Arc};
 use mandag_core::{
     async_trait,
     dale::Service,
-    http::{reply, Error},
+    http::{reply, HttpError},
     prelude::*,
     Extension, ExtensionCtx, Request,
 };
@@ -34,12 +34,12 @@ impl<C> Extension<C> for TeraExt
 where
     C: ExtensionCtx,
 {
-    async fn build(&self, ctx: &mut C) -> Result<(), Error> {
+    async fn build(&self, ctx: &mut C) -> Result<(), HttpError> {
         let cfg: TeraConfig = ctx.config().try_get("templates").expect("tera config");
 
         let path = cfg.path.join("**/*").to_string();
 
-        let tera = tera::Tera::new(&path).map_err(Error::new)?;
+        let tera = tera::Tera::new(&path).map_err(HttpError::new)?;
 
         ctx.register(Tera(Arc::new(tera)));
 
@@ -59,7 +59,7 @@ impl Tera {
 
                 let ctx = Context::default();
 
-                let template = tera.render(&path, &ctx).map_err(Error::new).unwrap();
+                let template = tera.render(&path, &ctx).map_err(HttpError::new).unwrap();
 
                 reply::html(template)
             }

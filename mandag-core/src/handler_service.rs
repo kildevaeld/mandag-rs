@@ -10,10 +10,10 @@ pub struct HandlerService<H>(pub H);
 impl<H> Service<Request> for HandlerService<H>
 where
     H: Clone + 'static,
-    for<'a> H: Handler<'a>,
-    for<'a> <H as Handler<'a>>::Error: Into<Error>,
-    for<'a> <<H as Handler<'a>>::Input as FromRequest<'a>>::Error: Into<Error>,
-    for<'a> <<H as Handler<'a>>::Data as FromBody>::Error: Into<Error>,
+    H: Handler,
+    <H as Handler>::Error: Into<Error>,
+    for<'a> <<H as Handler>::Input<'a> as FromRequest<'a>>::Error: Into<Error>,
+    <<H as Handler>::Data as FromBody>::Error: Into<Error>,
 {
     type Output = Outcome<Response, Error, Request>;
     type Future = BoxFuture<'static, Self::Output>;
@@ -24,7 +24,7 @@ where
             let body = std::mem::replace(req.body_mut(), Body::empty());
 
             let input = {
-                let input_req = <H::Input as FromRequest>::from_request(&req)
+                let input_req = <H::Input<'_> as FromRequest>::from_request(&req)
                     .await
                     .into_outcome();
 

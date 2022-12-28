@@ -2,20 +2,22 @@ use crate::{body::FromBody, handler_service::HandlerService, req::FromRequest, R
 use async_trait::async_trait;
 
 #[async_trait]
-pub trait Handler<'r>: Send + Sync {
-    type Input: FromRequest<'r>;
+pub trait Handler: Send + Sync {
+    type Input<'r>: FromRequest<'r>
+    where
+        Self: 'r;
     type Data: FromBody;
     type Output: Reply;
     type Error;
 
-    async fn handle(
-        &'r self,
-        input: Self::Input,
+    async fn handle<'r>(
+        &self,
+        input: Self::Input<'r>,
         data: Self::Data,
     ) -> Result<Self::Output, Self::Error>;
 }
 
-pub trait HandlerExt<'a>: Handler<'a> {
+pub trait HandlerExt: Handler {
     fn service(self) -> HandlerService<Self>
     where
         Self: Sized,
@@ -24,4 +26,4 @@ pub trait HandlerExt<'a>: Handler<'a> {
     }
 }
 
-impl<'a, H> HandlerExt<'a> for H where H: Handler<'a> {}
+impl<H> HandlerExt for H where H: Handler {}

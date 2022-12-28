@@ -70,17 +70,18 @@ pub fn create_handler(input: &ItemFn, data: &Option<String>) -> TokenStream {
         }
 
         #[mandag::async_trait]
-        impl<'r> #crate_name::Handler<'r> for #struct_name {
-            type Input = (
+        impl #crate_name::Handler for #struct_name {
+            type Input<'r> = (
                 #(#input_types),*
             );
+
 
             type Data = #data_type;
             type Output = #crate_name::http::Response;
             type Error = #crate_name::http::HttpError;
 
 
-            async fn handle(&'r self, input: Self::Input, #data_arg: Self::Data) -> Result<Self::Output, Self::Error> {
+            async fn handle<'r>(&self, input: Self::Input<'r>, #data_arg: Self::Data) -> Result<Self::Output, Self::Error> {
                 let (#(#input_args),*) = input;
                 let ret = self._call(#(#call_args),*).await;
                 Ok(ret)

@@ -23,7 +23,7 @@ mod api {
 
     #[get(path = "/")]
     pub fn list_todos(todos: AppExt<Todos>) {
-        Result::<_, Error>::Ok(reply::json(todos.list()))
+        reply::json(todos.list())
     }
 
     // #[post(path = "/", data = "data")]
@@ -59,7 +59,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .build()
         .await?
         .route(api::Routes)
-        .route((index, Route::get("/create", Tera::template("form.html"))))
+        .route(index)
+        .route(Route::get("/create", Tera::template("form.html")))
         .listen(([127, 0, 0, 1], 3000))
         .await?;
 

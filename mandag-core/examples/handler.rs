@@ -6,13 +6,13 @@ use mandag_serve::ServiceServeExt;
 struct Home;
 
 #[async_trait]
-impl<'r> Handler<'r> for Home {
-    type Input = ();
+impl Handler for Home {
+    type Input<'r> = ();
     type Data = ();
     type Error = Error;
     type Output = &'static str;
 
-    async fn handle(&'r self, _req: (), _data: ()) -> Result<Self::Output, Self::Error> {
+    async fn handle<'r>(&self, _req: (), _data: ()) -> Result<Self::Output, Self::Error> {
         Ok("Hello, World")
     }
 }

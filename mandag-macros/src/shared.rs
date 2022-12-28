@@ -17,3 +17,8 @@ pub struct RouteDataArgs {
 pub struct RouteArgs {
     pub path: String,
 }
+
+#[derive(Debug, FromMeta)]
+pub struct ModuleArgs {
+    pub path: Option<String>,
+}

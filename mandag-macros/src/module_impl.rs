@@ -1,4 +1,4 @@
-use crate::utils::crate_ident_name;
+use crate::{shared::ModuleArgs, utils::crate_ident_name};
 
 use super::{
     route,
@@ -8,9 +8,18 @@ use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
-use syn::{parse_macro_input, Item, ItemFn, ItemMod};
+use syn::{parse_macro_input, AttributeArgs, Item, ItemFn, ItemMod};
 
-pub fn create(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn create(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr_args = parse_macro_input!(attr as AttributeArgs);
+
+    let ModuleArgs { path } = match ModuleArgs::from_list(&attr_args) {
+        Ok(v) => v,
+        Err(e) => {
+            return TokenStream::from(e.write_errors());
+        }
+    };
+
     let crate_name = crate_ident_name("mandag");
 
     let module = parse_macro_input!(item as ItemMod);
@@ -27,7 +36,19 @@ pub fn create(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     };
 
-    let struct_name = Ident::new("_route_", Span::call_site());
+    let struct_name = Ident::new("Routes", Span::call_site());
+
+    let routes: Vec<_> = if let Some(path) = path {
+        routes
+            .into_iter()
+            .map(|m| quote!(#m.mounted_on(#path).into_routes()?))
+            .collect()
+    } else {
+        routes
+            .into_iter()
+            .map(|m| quote!(#m.into_routes()?))
+            .collect()
+    };
 
     let output = quote! {
 
@@ -44,7 +65,7 @@ pub fn create(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 fn into_routes(self) -> Result<Vec<#crate_name::router::StaticRoute>, Self::Error> {
                     let mut routes = vec![];
                     #(
-                        routes.extend(#routes.into_routes()?);
+                        routes.extend(#routes);
                     )*
                     Ok(routes)
                 }

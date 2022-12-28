@@ -1,30 +1,45 @@
-use mandag::{http::Error, reply, req::AppExt, router::IntoRoutesExt, Route};
+use mandag::{http::Error, prelude::Set, reply, req::AppExt, router::IntoRoutesExt, Route};
 use mandag_tera::Tera;
+
 use store::TodoStore;
 
 mod store;
 
-#[mandag::module]
+#[mandag::module(path = "/api/todos")]
 mod api {
 
     use super::store::CreateTodo;
-    use mandag::{body::Json, reply, req::AppExt};
+    use dale_http::{StatusCode, Uri};
+    use mandag::{
+        body::{Form, Json},
+        http::Error,
+        prelude::*,
+        reply,
+        req::AppExt,
+    };
+    use mandag_core::Body;
 
     use crate::store::Todos;
 
     #[get(path = "/")]
     pub fn list_todos(todos: AppExt<Todos>) {
-        reply::json(todos.list())
+        Result::<_, Error>::Ok(reply::json(todos.list()))
     }
 
+    // #[post(path = "/", data = "data")]
+    // pub fn create_todo(todos: AppExt<Todos>, data: Json<CreateTodo>) {
+    //     let todo = todos.insert(data.into_inner());
+    //     reply::json(todo)
+    // }
+
     #[post(path = "/", data = "data")]
-    pub fn create_todo(todos: AppExt<Todos>, data: Json<CreateTodo>) {
+    pub fn create_todo2(todos: AppExt<Todos>, data: Form<CreateTodo>) {
         let todo = todos.insert(data.into_inner());
-        reply::json(todo)
+        reply::redirect(Uri::from_static("/")).set(StatusCode::TEMPORARY_REDIRECT)
     }
 }
 
-#[mandag::get(path = "/")]
+#[mandag::any(path = "/")]
 fn index(tera: AppExt<Tera>, todos: AppExt<store::Todos>) {
     let mut ctx = mandag_tera::Context::default();
 
@@ -43,9 +58,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .attach(mandag_tera::TeraExt)
         .build()
         .await?
-        .route(api::_route_.mounted_on("/api/todos"))
-        .route(Route::get("/test", Tera::template("index.html")))
-        .route(index)
+        .route(api::Routes)
+        .route((index, Route::get("/create", Tera::template("form.html"))))
         .listen(([127, 0, 0, 1], 3000))
         .await?;
 

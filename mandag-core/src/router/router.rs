@@ -7,13 +7,13 @@ use router::IntoRoutes as _;
 use std::{convert::Infallible, sync::Arc};
 
 pub struct RouteEntry {
-    method: Method,
+    method: Option<Method>,
     handler: BoxService<'static, Request, Response, Error>,
 }
 
 impl RouteEntry {
     pub fn new(
-        method: Method,
+        method: Option<Method>,
         handler: BoxService<'static, Request, Response, Error>,
     ) -> RouteEntry {
         RouteEntry { method, handler }
@@ -34,7 +34,7 @@ impl Default for Router {
 
 impl Router {
     pub fn register(&mut self, route: StaticRoute) -> Result<(), Error> {
-        let entry = RouteEntry::new(route.method, route.service);
+        let entry = RouteEntry::new(route.method.clone(), route.service);
 
         self.i.register(route.segments, entry)?;
 
@@ -51,7 +51,7 @@ impl IntoRoutes for Router {
             .into_iter()
             .map(|(segments, handlers)| {
                 handlers.into_iter().map(move |handler| {
-                    StaticRoute::new(handler.method, segments.clone(), handler.handler)
+                    StaticRoute::new(handler.method.into(), segments.clone(), handler.handler)
                 })
             })
             .flatten()
@@ -97,16 +97,19 @@ impl Service<Request> for RouterService {
 
             req.extensions_mut().insert(params);
 
-            for next in found
-                .iter()
-                .filter(|route| route.method == method || (is_head && route.method == Method::GET))
-            {
+            for next in found.iter().filter(|route| {
+                if let Some(route_method) = &route.method {
+                    route_method == method || (is_head && route_method == Method::GET)
+                } else {
+                    true
+                }
+            }) {
                 match next.handler.call(req).await {
                     Outcome::Next(r) => {
                         req = r;
                     }
                     Outcome::Success(mut success) => {
-                        if method != next.method && is_head {
+                        if Some(method) != next.method && is_head {
                             *success.body_mut() = Body::empty();
                             *success.status_mut() = StatusCode::NO_CONTENT;
                         }

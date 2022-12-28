@@ -50,7 +50,13 @@ where
 impl Tera {
     pub fn template(
         path: &str,
-    ) -> impl Service<Request, Output = reply::Html<String>, Future = impl Future + Send> {
+    ) -> impl Service<
+        Request,
+        Output = reply::Html<String>,
+        Future = impl Future<Output = reply::Html<String>> + Send,
+    > + Clone
+           + Send
+           + Sync {
         let path = path.to_string();
         move |req: Request| {
             let path = path.clone();

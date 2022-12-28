@@ -13,6 +13,7 @@ where
     for<'a> H: Handler<'a>,
     for<'a> <H as Handler<'a>>::Error: Into<Error>,
     for<'a> <<H as Handler<'a>>::Input as FromRequest<'a>>::Error: Into<Error>,
+    for<'a> <<H as Handler<'a>>::Data as FromBody>::Error: Into<Error>,
 {
     type Output = Outcome<Response, Error, Request>;
     type Future = BoxFuture<'static, Self::Output>;
@@ -31,6 +32,7 @@ where
                     Outcome::Success(ret) => ret,
                     Outcome::Next(_) => {
                         drop(input_req);
+                        *req.body_mut() = body;
                         return Outcome::Next(req);
                     }
                     Outcome::Failure(err) => return Outcome::Failure(err.into()),
@@ -42,7 +44,7 @@ where
 
             let data = match data_reg {
                 Ok(ret) => ret,
-                Err(_err) => panic!("call failed"),
+                Err(err) => return Outcome::Failure(err.into()),
             };
 
             let ret = match handler.handle(input, data).await {

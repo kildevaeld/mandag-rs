@@ -50,7 +50,8 @@ macro_rules! methods_data {
 methods!(
     get => Get,
     delete => Delete,
-    head => Head
+    head => Head,
+    any => Any
 );
 
 methods_data!(

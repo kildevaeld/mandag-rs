@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     mandag::Core::default()
         .build()
         .await?
-        .route(api::_route_)
+        .route(api::Routes)
         .listen(([127, 0, 0, 1], 3000))
         .await?;
 

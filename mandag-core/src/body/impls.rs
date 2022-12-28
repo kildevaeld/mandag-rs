@@ -65,3 +65,39 @@ where
         Ok(Json(resp))
     }
 }
+
+pub struct Form<T>(T);
+
+impl<T> Form<T> {
+    pub fn into_inner(self) -> T {
+        self.0
+    }
+}
+
+impl<T> std::ops::Deref for Form<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> std::ops::DerefMut for Form<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+#[async_trait]
+impl<T> FromBody for Form<T>
+where
+    T: Send,
+    for<'a> T: serde::de::Deserialize<'a>,
+{
+    type Error = dale_http::Error;
+
+    async fn from_body(body: Body) -> Result<Self, Self::Error> {
+        let resp = body.form::<T>().await?;
+        Ok(Form(resp))
+    }
+}

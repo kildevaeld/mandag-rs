@@ -10,14 +10,14 @@ pub type StaticRoute =
     Route<'static, Segments<'static>, BoxService<'static, Request, Response, Error>>;
 
 pub struct Route<'a, P, S> {
-    pub(crate) method: Method,
+    pub(crate) method: Option<Method>,
     pub(crate) service: S,
     pub(crate) segments: P,
     pub(crate) _a: PhantomData<&'a fn()>,
 }
 
 impl<'a, P, S> Route<'a, P, S> {
-    pub const fn new(method: Method, segments: P, service: S) -> Route<'a, P, S> {
+    pub const fn new(method: Option<Method>, segments: P, service: S) -> Route<'a, P, S> {
         Route {
             method,
             service,
@@ -27,11 +27,11 @@ impl<'a, P, S> Route<'a, P, S> {
     }
 
     pub const fn get(path: P, service: S) -> Route<'a, P, S> {
-        Route::new(Method::GET, path, service)
+        Route::new(Some(Method::GET), path, service)
     }
 
     pub const fn post(path: P, service: S) -> Route<'a, P, S> {
-        Route::new(Method::POST, path, service)
+        Route::new(Some(Method::POST), path, service)
     }
 }
 

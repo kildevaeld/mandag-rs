@@ -29,7 +29,7 @@ macro_rules! method {
             <S::Output as IntoOutcome<Request>>::Success: Reply + Send,
             <S::Output as IntoOutcome<Request>>::Failure: Into<Error>,
         {
-            self.route(Route::new(Method::$method, path.to_string(), service));
+            self.route(Route::new(Method::$method.into(), path.to_string(), service));
             self
         }
         )*

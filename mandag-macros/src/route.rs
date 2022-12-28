@@ -15,18 +15,20 @@ pub enum Method {
     Delete,
     // Options,
     Head,
+    Any,
 }
 
 impl Method {
     fn to_tokens(self, crate_name: &syn::Ident) -> impl ToTokens {
         match self {
-            Method::Get => quote!(#crate_name::http::Method::GET),
-            Method::Post => quote!(#crate_name::http::Method::POST),
-            Method::Put => quote!(#crate_name::http::Method::PUT),
-            Method::Patch => quote!(#crate_name::http::Method::PATCH),
-            Method::Delete => quote!(#crate_name::http::Method::DELETE),
+            Method::Get => quote!(Some(#crate_name::http::Method::GET)),
+            Method::Post => quote!(Some(#crate_name::http::Method::POST)),
+            Method::Put => quote!(Some(#crate_name::http::Method::PUT)),
+            Method::Patch => quote!(Some(#crate_name::http::Method::PATCH)),
+            Method::Delete => quote!(Some(#crate_name::http::Method::DELETE)),
             // Method::Options => quote!(#crate_name::http::Method::OPTIONS),
-            Method::Head => quote!(#crate_name::http::Method::HEAD),
+            Method::Head => quote!(Some(#crate_name::http::Method::HEAD)),
+            Method::Any => quote!(None),
         }
     }
 }
@@ -40,6 +42,7 @@ impl FromStr for Method {
             "patch" => Method::Patch,
             "put" => Method::Put,
             "delete" => Method::Delete,
+            "any" => Method::Any,
             _ => return Err(format!("method not found: {}", s)),
         };
         Ok(method)

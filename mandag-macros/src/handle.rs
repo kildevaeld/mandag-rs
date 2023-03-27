@@ -13,10 +13,12 @@ use crate::{
 pub fn create_handler(input: &ItemFn, data: &Option<String>) -> TokenStream {
     let crate_name = crate_ident_name("mandag");
 
-    let call_params = parse_parameters(&input).map(|item| {
-        let ty = &item;
-        quote!(#ty)
-    });
+    let call_params = parse_parameters(&input)
+        .map(|item| {
+            let ty = &item;
+            quote!(#ty)
+        })
+        .collect::<Vec<_>>();
 
     let call_args = parse_parameters(&input).map(|item| {
         let pat = &item.pat;
@@ -59,6 +61,12 @@ pub fn create_handler(input: &ItemFn, data: &Option<String>) -> TokenStream {
         #vis struct #struct_name;
 
         impl #struct_name {
+
+            async fn __call<'r>(&self, #(#call_params),*) -> impl #crate_name::IntoOutcome<#crate_name::http::Request, Success = impl #crate_name::Reply, Failure = impl Into<#crate_name::Error>> {
+                use #crate_name::{Outcome, http::Reply, Error};
+                let ret = async move #block.await;
+                ret
+            }
 
             async fn _call<'r>(&self, #(#call_params),*) -> #crate_name::http::Response {
                 use #crate_name::{Outcome, http::Reply, Error};

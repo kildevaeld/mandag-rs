@@ -1,4 +1,9 @@
-use super::{into_routes_box, IntoRoutes, IntoRoutesBox, IntoRoutesExt, Route, Router};
+use std::sync::Arc;
+
+use super::router::SharedRouter;
+use super::{
+    into_routes_box, IntoRoutes, IntoRoutesBox, IntoRoutesExt, Route, Router, RouterService,
+};
 use crate::{Reply, Request, Response};
 use dale::IntoService;
 use dale::{BoxService, IntoOutcome, Service, ServiceExt, VecService};
@@ -63,18 +68,22 @@ pub struct RoutesBuilder {
     pub services: Vec<BoxService<'static, Request, Response, Error>>,
 }
 
+type RoutesBuilderService = dale::combinators::Unify<
+    dale::combinators::Or<
+        VecService<BoxService<'static, Request, Response, Error>>,
+        RouterService,
+        Request,
+    >,
+>;
+
 impl RoutesBuilder {
     pub fn extend(&mut self, service: RoutesBuilder) -> &mut Self {
         self.routes.extend(service.routes);
         self.services.extend(service.services);
         self
     }
-}
 
-impl IntoService<Request> for RoutesBuilder {
-    type Error = Error;
-    type Service = BoxService<'static, Request, Response, Error>;
-    fn into_service(self) -> Result<Self::Service, Self::Error> {
+    pub fn build(self) -> Result<(SharedRouter, RoutesBuilderService), Error> {
         let service = VecService::new(self.services);
 
         let mut router = Router::default();
@@ -85,8 +94,19 @@ impl IntoService<Request> for RoutesBuilder {
             }
         }
 
-        let service = service.or(router.into_service()?).unify().boxed();
+        let router = Arc::new(router.into_inner());
 
+        let service = service.or(RouterService::new(router.clone())).unify();
+
+        Ok((router, service))
+    }
+}
+
+impl IntoService<Request> for RoutesBuilder {
+    type Error = Error;
+    type Service = RoutesBuilderService;
+    fn into_service(self) -> Result<Self::Service, Self::Error> {
+        let (_, service) = self.build()?;
         Ok(service)
     }
 }

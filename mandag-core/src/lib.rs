@@ -16,7 +16,7 @@ pub mod router;
 pub use self::{
     app::App,
     error::*,
-    extension::{Extension, ExtensionCtx},
+    extension::{Extension, ExtensionConfig, ExtensionCtx},
     handler::*,
     module::{Module, ModuleBuildCtx},
     plugin::{Pluggable, Plugin},

@@ -4,11 +4,20 @@ use dale::IntoService;
 use dale::{boxed::BoxFuture, BoxService, Outcome, Service};
 use dale_http::{error::Error, router::Params, Method, StatusCode};
 use router::IntoRoutes as _;
+use std::fmt;
 use std::{convert::Infallible, sync::Arc};
+
+pub type SharedRouter = Arc<router::Router<RouteEntry>>;
 
 pub struct RouteEntry {
     method: Option<Method>,
     handler: BoxService<'static, Request, Response, Error>,
+}
+
+impl fmt::Debug for RouteEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("RouteEntry").finish()
+    }
 }
 
 impl RouteEntry {
@@ -39,6 +48,15 @@ impl Router {
         self.i.register(route.segments, entry)?;
 
         Ok(())
+    }
+
+    pub fn dump(&self) {
+        let routes = self.i.routes().map(|m| m.to_string()).collect::<Vec<_>>();
+        println!("{:#?}", routes);
+    }
+
+    pub(crate) fn into_inner(self) -> router::Router<RouteEntry> {
+        self.i
     }
 }
 
@@ -74,6 +92,12 @@ impl IntoService<Request> for Router {
 #[derive(Clone)]
 pub struct RouterService {
     router: Arc<router::Router<RouteEntry>>,
+}
+
+impl RouterService {
+    pub fn new(router: Arc<router::Router<RouteEntry>>) -> RouterService {
+        RouterService { router }
+    }
 }
 
 impl Service<Request> for RouterService {

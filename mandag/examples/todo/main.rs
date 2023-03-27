@@ -1,9 +1,8 @@
+mod store;
+
 use mandag::{http::Error, prelude::Set, reply, req::AppExt, router::IntoRoutesExt, Route};
 use mandag_tera::Tera;
-
 use store::TodoStore;
-
-mod store;
 
 #[mandag::module(path = "/api/todos")]
 mod api {
@@ -11,13 +10,12 @@ mod api {
     use super::store::CreateTodo;
     use dale_http::{StatusCode, Uri};
     use mandag::{
-        body::{Form, Json},
+        body::{Body, Form, Json},
         http::Error,
         prelude::*,
         reply,
         req::AppExt,
     };
-    use mandag_core::Body;
 
     use crate::store::Todos;
 
@@ -26,11 +24,11 @@ mod api {
         reply::json(todos.list())
     }
 
-    // #[post(path = "/", data = "data")]
-    // pub fn create_todo(todos: AppExt<Todos>, data: Json<CreateTodo>) {
-    //     let todo = todos.insert(data.into_inner());
-    //     reply::json(todo)
-    // }
+    #[post(path = "/", data = "data")]
+    pub fn create_todo(todos: AppExt<Todos>, data: Json<CreateTodo>) {
+        let todo = todos.insert(data.into_inner());
+        reply::json(todo)
+    }
 
     #[post(path = "/", data = "data")]
     pub fn create_todo2(todos: AppExt<Todos>, data: Form<CreateTodo>) {

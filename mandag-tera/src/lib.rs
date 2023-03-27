@@ -5,7 +5,7 @@ use mandag_core::{
     dale::Service,
     http::{reply, HttpError},
     prelude::*,
-    Extension, ExtensionCtx, Request,
+    Extension, ExtensionConfig, ExtensionCtx, Request,
 };
 use relative_path::RelativePathBuf;
 
@@ -29,17 +29,23 @@ pub struct TeraConfig {
     path: RelativePathBuf,
 }
 
+impl ExtensionConfig for TeraConfig {
+    const KEY: &'static str = "templates";
+}
+
 #[async_trait]
 impl<C> Extension<C> for TeraExt
 where
     C: ExtensionCtx,
 {
-    async fn build(&self, ctx: &mut C) -> Result<(), HttpError> {
-        let cfg: TeraConfig = ctx.config().try_get("templates").expect("tera config");
+    const NAME: &'static str = "Tera";
+    type Config = TeraConfig;
+    type Error = tera::Error;
 
+    async fn init(&self, ctx: &mut C, cfg: Self::Config) -> Result<(), Self::Error> {
         let path = cfg.path.join("**/*").to_string();
 
-        let tera = tera::Tera::new(&path).map_err(HttpError::new)?;
+        let tera = tera::Tera::new(&path)?;
 
         ctx.register(Tera(Arc::new(tera)));
 

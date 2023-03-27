@@ -1,13 +1,20 @@
-use super::{Body, FromBody};
+use super::{Body, FromBody, Outcome};
+use crate::Request;
 use async_trait::async_trait;
-use dale_http::{prelude::BodyExt, Bytes};
+use dale::IntoOutcome;
+use dale_http::{
+    headers::{ContentType, HeaderMapExt},
+    mime::Mime,
+    prelude::BodyExt,
+    Bytes,
+};
 use std::convert::Infallible;
 
 #[async_trait]
 impl FromBody for Body {
     type Error = Infallible;
-
-    async fn from_body(body: Body) -> Result<Self, Self::Error> {
+    type Output = Result<Self, Self::Error>;
+    async fn from_body(_req: &Request, body: Body) -> Result<Self, Self::Error> {
         Ok(body)
     }
 }
@@ -15,8 +22,8 @@ impl FromBody for Body {
 #[async_trait]
 impl FromBody for Bytes {
     type Error = hyper::Error;
-
-    async fn from_body(body: Body) -> Result<Self, Self::Error> {
+    type Output = Result<Self, Self::Error>;
+    async fn from_body(_req: &Request, body: Body) -> Result<Self, Self::Error> {
         body.bytes().await
     }
 }
@@ -24,8 +31,8 @@ impl FromBody for Bytes {
 #[async_trait]
 impl FromBody for () {
     type Error = Infallible;
-
-    async fn from_body(_body: Body) -> Result<Self, Self::Error> {
+    type Output = Result<Self, Self::Error>;
+    async fn from_body(_req: &Request, _body: Body) -> Result<Self, Self::Error> {
         Ok(())
     }
 }
@@ -58,11 +65,21 @@ where
     T: Send,
     for<'a> T: serde::de::Deserialize<'a>,
 {
-    type Error = dale_http::Error;
+    type Error = dale_http::encoder::DecodeError;
+    type Output = Outcome<Self, Self::Error>;
 
-    async fn from_body(body: Body) -> Result<Self, Self::Error> {
-        let resp = body.json::<T>().await?;
-        Ok(Json(resp))
+    async fn from_body(req: &Request, body: Body) -> Self::Output {
+        let Some(content_type) = req.headers().typed_get::<ContentType>() else {
+            return Outcome::Next(body);
+        };
+
+        let content_type: Mime = content_type.into();
+
+        if content_type != mime::APPLICATION_JSON {
+            return Outcome::Next(body);
+        }
+
+        body.json::<T>().await.into_outcome().map(Json)
     }
 }
 
@@ -94,10 +111,21 @@ where
     T: Send,
     for<'a> T: serde::de::Deserialize<'a>,
 {
-    type Error = dale_http::Error;
+    type Error = dale_http::encoder::DecodeError;
 
-    async fn from_body(body: Body) -> Result<Self, Self::Error> {
-        let resp = body.form::<T>().await?;
-        Ok(Form(resp))
+    type Output = Outcome<Self, Self::Error>;
+
+    async fn from_body(req: &Request, body: Body) -> Self::Output {
+        let Some(content_type) = req.headers().typed_get::<ContentType>() else {
+            return Outcome::Next(body);
+        };
+
+        let content_type: Mime = content_type.into();
+
+        if content_type != mime::APPLICATION_WWW_FORM_URLENCODED {
+            return Outcome::Next(body);
+        }
+
+        body.form::<T>().await.into_outcome().map(Form)
     }
 }

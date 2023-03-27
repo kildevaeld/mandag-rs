@@ -1,6 +1,6 @@
 use super::{Phase, Start};
 use crate::{Module, ModuleBuildCtx};
-use dale::{IntoOutcome, IntoService, Service, ServiceExt};
+use dale::{IntoOutcome, Service, ServiceExt};
 use dale_extensions::StateMiddleware;
 use dale_http::error::Error;
 use johnfig::Config;
@@ -71,12 +71,13 @@ impl Build {
             module.build(&mut ctx).await?;
         }
 
-        let service = ctx
-            .builder
-            .into_service()?
-            .wrap(StateMiddleware::new(App::new(ctx.store, ctx.config)))
-            .boxed()
-            .shared();
+        let (router, service) = ctx.builder.build()?;
+
+        let service = service.wrap(StateMiddleware::new(App::new(
+            router, ctx.store, ctx.config,
+        )));
+
+        let service = service.boxed().shared();
 
         Ok(Start { service })
     }

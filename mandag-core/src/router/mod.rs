@@ -6,7 +6,7 @@ mod routing;
 pub use self::{
     into_routes::*,
     route::*,
-    router::{Router, RouterService},
+    router::{Router, RouterService, SharedRouter},
     routing::*,
 };
 

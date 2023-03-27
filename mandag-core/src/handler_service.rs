@@ -40,13 +40,20 @@ where
                 input
             };
 
-            let data_reg = <H::Data as FromBody>::from_body(body).await;
+            let data = {
+                let data_reg = into_data::<H::Data>(&req, body).await;
 
-            let data = match data_reg {
-                Ok(ret) => ret,
-                Err(err) => return Outcome::Failure(err.into()),
+                let data = match data_reg {
+                    Outcome::Success(ret) => ret,
+                    Outcome::Next(body) => {
+                        drop(input);
+                        *req.body_mut() = body;
+                        return Outcome::Next(req);
+                    }
+                    Outcome::Failure(err) => return Outcome::Failure(err.into()),
+                };
+                data
             };
-
             let ret = match handler.handle(input, data).await {
                 Ok(ret) => ret,
                 Err(err) => return Outcome::Failure(err.into()),
@@ -57,4 +64,13 @@ where
             Outcome::Success(response)
         })
     }
+}
+
+#[inline]
+async fn into_data<B>(req: &Request, body: Body) -> Outcome<B, B::Error, Body>
+where
+    B: FromBody,
+{
+    let data_reg = B::from_body(req, body).await;
+    data_reg.into_outcome()
 }

@@ -17,7 +17,7 @@ pub use dale_http::error::Error;
 
 pub type Outcome = dale::Outcome<mandag_core::Response, Error, mandag_core::Request>;
 
-pub use dale::Service;
+pub use dale::{IntoOutcome, Service};
 
 pub use dale_http::reply;
 

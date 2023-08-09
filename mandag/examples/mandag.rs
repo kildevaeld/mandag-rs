@@ -40,6 +40,7 @@ struct TestExt;
 impl<C: ExtensionCtx> Extension<C> for TestExt {
     async fn build(&self, _ctx: &mut C) -> Result<(), Error> {
         println!("init extension");
+
         Ok(())
     }
 }
@@ -50,13 +51,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .attach(TestExt)
         .build()
         .await?
-        .route(Route::get(
-            "/",
-            |_req: Request| async move { "Hello, World!" },
-        ))
         .module(TestModule)
-        .route(test)
-        .route(Route::get("/hello", index.service()))
+        .route((
+            test,
+            Route::get("/hello", index.service()),
+            Route::get("/", |_req: Request| async move { "Hello, World!" }),
+        ))
         .route(Router::default())
         .listen(([127, 0, 0, 1], 3000))
         .await?;

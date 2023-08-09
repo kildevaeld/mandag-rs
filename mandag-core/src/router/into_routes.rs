@@ -105,3 +105,35 @@ where
 {
     Box::new(BoxedIntoRoutes(NamedSpaced { path, routes }))
 }
+
+macro_rules! into_routes {
+    ($one: ident) => {
+        impl<$one> IntoRoutes for ($one,)
+        where
+            $one: IntoRoute,
+        {
+            type Error = $one::Error;
+            fn into_routes(self) -> Result<Vec<StaticRoute>, Self::Error> {
+                Ok(vec![self.0.into_route()?])
+            }
+        }
+    };
+
+    ($first: ident $($rest: ident)*) => {
+        into_routes!($($rest)*);
+
+        impl<$first: IntoRoute, $($rest: IntoRoute<Error = $first::Error>),*> IntoRoutes for ($first, $($rest),*) {
+            type Error = $first::Error;
+            #[allow(non_snake_case)]
+            fn into_routes(self) -> Result<Vec<StaticRoute>, Self::Error> {
+                let ($first, $($rest),*) = self;
+                Ok(vec![
+                    $first.into_route()?,
+                    $($rest.into_route()?),*
+                ])
+            }
+        }
+    };
+}
+
+into_routes!(T1 T2 T3 T4 T5 T6 T7 T8);

@@ -46,6 +46,14 @@ pub trait RoutingExt: Routing {
         self.route(route.mounted_on(path))
     }
 
+    fn extend<R>(&mut self, routes: R) -> &mut Self
+    where
+        R: IntoRoutes + Sync + Send + 'static,
+        R::Error: std::error::Error + Send + Sync,
+    {
+        self.route(routes)
+    }
+
     method!(
         get => GET,
         delete => DELETE,

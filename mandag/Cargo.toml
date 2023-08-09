@@ -16,7 +16,10 @@ dale-extensions = { git = "https://github.com/kildevaeld/dale-rs", features = [
 dale-http = { git = "https://github.com/kildevaeld/dale-rs", features = [
     "router",
 ] }
-johnfig = { git = "https://github.com/kildevaeld/johnfig-rs", features = [] }
+johnfig = { git = "https://github.com/kildevaeld/johnfig-rs", features = [
+    "builder",
+    "json",
+] }
 router = { git = "https://github.com/kildevaeld/router-rs", features = [] }
 
 http = "0.2"
@@ -35,8 +38,8 @@ pin-project-lite = "0.2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt", "macros"] }
-serde = { version = "1", features = ["derive"]}
-mandag-tera = { path = "../mandag-tera"}
+serde = { version = "1", features = ["derive"] }
+mandag-tera = { path = "../mandag-tera" }
 
 
 [[example]]
